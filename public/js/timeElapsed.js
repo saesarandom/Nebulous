@@ -23,20 +23,12 @@ async function initializeTimeCounter() {
     return;
   }
 
-  // Create or get the counter element
   timeCounterElement = document.getElementById("game-time-counter");
   if (!timeCounterElement) {
     timeCounterElement = document.createElement("div");
     timeCounterElement.id = "game-time-counter";
     timeCounterElement.className = "game-time-counter";
-    timeCounterElement.style.position = "fixed";
-    timeCounterElement.style.top = "10px";
-    timeCounterElement.style.right = "20px";
-    timeCounterElement.style.padding = "10px";
-    timeCounterElement.style.background = "rgba(0,0,0,0.7)";
-    timeCounterElement.style.border = "1px solid #444";
-    timeCounterElement.style.borderRadius = "5px";
-    timeCounterElement.style.zIndex = "1000";
+    // Remove inline styles to let CSS handle the positioning
     document.body.appendChild(timeCounterElement);
   }
 
