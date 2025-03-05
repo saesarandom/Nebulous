@@ -323,6 +323,31 @@
                   </div>
                 </div>
 
+                <div class="row mt-4">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="planet-name" class="form-label"
+                        >Planet Name (2-15 characters):</label
+                      >
+                      <input
+                        type="text"
+                        id="planet-name"
+                        class="form-control"
+                        placeholder="Enter a name for your planet"
+                        minlength="2"
+                        maxlength="15"
+                      />
+                      <div
+                        id="name-validation"
+                        class="text-danger mt-1"
+                        style="display: none"
+                      >
+                        Name must be between 2 and 15 characters.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div class="text-center">
                   <button
                     id="confirm-planet"
@@ -356,134 +381,146 @@
     <script src="js/timeElapsed.js"></script>
 
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const planetTypes = document.querySelectorAll(".type-option");
-        const planetPreview = document.getElementById("planet-preview");
-        const sizeDisplay = document.getElementById("size-display");
-        const planetDescription = document.getElementById("planet-description");
-        const selectedType = document.getElementById("selected-type");
-        const sizeRange = document.getElementById("size-range");
-        const generatedSize = document.getElementById("generated-size");
-        const confirmButton = document.getElementById("confirm-planet");
+     
+document.addEventListener("DOMContentLoaded", function () {
+  const planetTypes = document.querySelectorAll(".type-option");
+  const planetPreview = document.getElementById("planet-preview");
+  const sizeDisplay = document.getElementById("size-display");
+  const planetDescription = document.getElementById("planet-description");
+  const selectedType = document.getElementById("selected-type");
+  const sizeRange = document.getElementById("size-range");
+  const generatedSize = document.getElementById("generated-size");
+  const confirmButton = document.getElementById("confirm-planet");
+  const planetNameInput = document.getElementById("planet-name");
+  const nameValidation = document.getElementById("name-validation");
 
-        // Planet descriptions
-        const descriptions = {
-          A: "Type A stars are the hottest and most massive stars, appearing blue or blue-white in color.",
-          B: "Type B stars are very bright blue-white stars that are extremely hot and luminous.",
-          F: "Type F stars are white in color and slightly larger and hotter than our Sun.",
-          G: "Type G stars (like our Sun) are yellow stars with moderate temperatures.",
-          K: "Type K stars are orange to red in color and slightly cooler than our Sun.",
-          O: "Type O stars are the rarest, hottest, and most massive stars, with blue-violet color.",
-          S: "Type S stars are giant stars similar to M-type stars but with excess amounts of zirconium oxide.",
-          "T Tauri":
-            "T Tauri stars are pre-main sequence stars, still in early stages of gravitational contraction.",
-          "Temná hvězda":
-            "A dark star is a theoretical object composed of dark matter that may have existed during the early universe.",
-          "Železná hvězda":
-            "Iron stars are a hypothetical type of star that could form after an extremely long time.",
-          "Neutronová hvězdda":
-            "Neutron stars are the collapsed cores of massive stars, incredibly dense with strong magnetic fields.",
-          "Terrestriální planeta":
-            "Terrestrial planets are Earth-like with solid rocky surfaces.",
-          "Plynný obr":
-            "Gas giants are large planets primarily composed of hydrogen and helium.",
-          "Ledový obr":
-            "Ice giants are planets composed primarily of substances heavier than hydrogen and helium.",
-          Exoplaneta:
-            "Exoplanets are planets that orbit stars outside our solar system.",
-        };
+  // Planet descriptions
+  const descriptions = {
+    A: "Type A stars are the hottest and most massive stars, appearing blue or blue-white in color.",
+    B: "Type B stars are very bright blue-white stars that are extremely hot and luminous.",
+    F: "Type F stars are white in color and slightly larger and hotter than our Sun.",
+    G: "Type G stars (like our Sun) are yellow stars with moderate temperatures.",
+    K: "Type K stars are orange to red in color and slightly cooler than our Sun.",
+    O: "Type O stars are the rarest, hottest, and most massive stars, with blue-violet color.",
+    S: "Type S stars are giant stars similar to M-type stars but with excess amounts of zirconium oxide.",
+    "T Tauri": "T Tauri stars are pre-main sequence stars, still in early stages of gravitational contraction.",
+    "Temná hvězda": "A dark star is a theoretical object composed of dark matter that may have existed during the early universe.",
+    "Železná hvězda": "Iron stars are a hypothetical type of star that could form after an extremely long time.",
+    "Neutronová hvězdda": "Neutron stars are the collapsed cores of massive stars, incredibly dense with strong magnetic fields.",
+    "Terrestriální planeta": "Terrestrial planets are Earth-like with solid rocky surfaces.",
+    "Plynný obr": "Gas giants are large planets primarily composed of hydrogen and helium.",
+    "Ledový obr": "Ice giants are planets composed primarily of substances heavier than hydrogen and helium.",
+    Exoplaneta: "Exoplanets are planets that orbit stars outside our solar system.",
+  };
 
-        let selectedPlanetData = null;
+  let selectedPlanetData = null;
 
-        // Add click event to each planet type option
-        planetTypes.forEach((option) => {
-          option.addEventListener("click", function () {
-            // Remove selected class from all options
-            planetTypes.forEach((opt) => opt.classList.remove("selected"));
+  // Add a validation function for planet name
+  function validatePlanetName() {
+    const name = planetNameInput.value.trim();
+    if (name.length < 2 || name.length > 15) {
+      nameValidation.style.display = "block";
+      return false;
+    }
+    nameValidation.style.display = "none";
+    return true;
+  }
 
-            // Add selected class to clicked option
-            this.classList.add("selected");
+  // Add event listener for input validation
+  planetNameInput.addEventListener("input", validatePlanetName);
 
-            // Get data from the selected option
-            const type = this.dataset.type;
-            const sizeRangeStr = this.dataset.size;
-            const [min, max] = sizeRangeStr.split("-").map(Number);
+  // Add click event to each planet type option
+  planetTypes.forEach((option) => {
+    option.addEventListener("click", function () {
+      // Remove selected class from all options
+      planetTypes.forEach((opt) => opt.classList.remove("selected"));
 
-            // Generate random size within range
-            const randomSize =
-              Math.floor(Math.random() * (max - min + 1)) + min;
+      // Add selected class to clicked option
+      this.classList.add("selected");
 
-            // Update planet preview
-            planetPreview.className = "planet-preview";
+      // Get data from the selected option
+      const type = this.dataset.type;
+      const sizeRangeStr = this.dataset.size;
+      const [min, max] = sizeRangeStr.split("-").map(Number);
 
-            // Convert type to CSS class name
-            let cssClass = "planet-" + type.toLowerCase().replace(/\s+/g, "-");
-            planetPreview.classList.add(cssClass);
+      // Generate random size within range
+      const randomSize = Math.floor(Math.random() * (max - min + 1)) + min;
 
-            // Update info displays
-            sizeDisplay.textContent = `${type}: ${randomSize.toLocaleString()} km`;
-            planetDescription.textContent =
-              descriptions[type] || "No description available.";
-            selectedType.textContent = type;
-            sizeRange.textContent = `${parseInt(
-              min
-            ).toLocaleString()} - ${parseInt(max).toLocaleString()} km`;
-            generatedSize.textContent = `${randomSize.toLocaleString()} km`;
+      // Update planet preview
+      planetPreview.className = "planet-preview";
 
-            // Store selected planet data
-            selectedPlanetData = {
-              type: type,
-              size: randomSize,
-              sizeRange: sizeRangeStr,
-            };
+      // Convert type to CSS class name
+      let cssClass = "planet-" + type.toLowerCase().replace(/\s+/g, "-");
+      planetPreview.classList.add(cssClass);
 
-            // Enable confirm button
-            confirmButton.disabled = false;
-          });
-        });
+      // Update info displays
+      sizeDisplay.textContent = `${type}: ${randomSize.toLocaleString()} km`;
+      planetDescription.textContent = descriptions[type] || "No description available.";
+      selectedType.textContent = type;
+      sizeRange.textContent = `${parseInt(min).toLocaleString()} - ${parseInt(max).toLocaleString()} km`;
+      generatedSize.textContent = `${randomSize.toLocaleString()} km`;
 
-        // Confirm button click event
-        confirmButton.addEventListener("click", async function () {
-          if (!selectedPlanetData) {
-            showError("Please select a planet type first.");
-            return;
-          }
+      // Store selected planet data
+      selectedPlanetData = {
+        type: type,
+        size: randomSize,
+        sizeRange: sizeRangeStr,
+      };
 
-          try {
-            const token = localStorage.getItem("token");
+      // Enable confirm button
+      confirmButton.disabled = false;
+    });
+  });
 
-            const response = await fetch("/api/planet/create", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify(selectedPlanetData),
-            });
+  // ONE confirm button click event (not duplicate)
+  confirmButton.addEventListener("click", async function () {
+    if (!selectedPlanetData) {
+      showError("Please select a planet type first.");
+      return;
+    }
 
-            if (response.ok) {
-              showSuccess(
-                "Planet created successfully! Redirecting to dashboard..."
-              );
+    // Validate planet name if provided
+    const planetName = planetNameInput.value.trim();
+    if (planetName && !validatePlanetName()) {
+      showError("Planet name must be between 2 and 15 characters.");
+      return;
+    }
 
-              // Redirect after 2 seconds
-              setTimeout(() => {
-                window.location.href = "dashboard.html";
-              }, 2000);
-            } else {
-              const data = await response.json();
-              showError(
-                data.message || "Failed to create planet. Please try again."
-              );
-            }
-          } catch (error) {
-            console.error("Error creating planet:", error);
-            showError(
-              "Connection error. Please check your internet connection and try again."
-            );
-          }
-        });
+    // Add the name to selectedPlanetData if provided
+    if (planetName) {
+      selectedPlanetData.name = planetName;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      
+      console.log("Sending data:", JSON.stringify(selectedPlanetData));
+
+      const response = await fetch("/api/planet/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(selectedPlanetData),
       });
-    </script>
-  </body>
-</html>
+
+      const data = await response.json();
+      console.log("Response:", response.status, data);
+
+      if (response.ok) {
+        showSuccess("Planet created successfully! Redirecting to dashboard...");
+
+        // Redirect after 2 seconds
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 2000);
+      } else {
+        showError(data.message || "Failed to create planet. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error creating planet:", error);
+      showError("Connection error. Please check your internet connection and try again.");
+    }
+  });
+});

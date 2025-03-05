@@ -54,10 +54,9 @@ const authenticateToken = (req, res, next) => {
 router.post("/api/planet/create", authenticateToken, async (req, res) => {
   try {
     console.log("Creating planet with data:", req.body);
-    const { type, size, sizeRange } = req.body;
-
-    // Use userId instead of id
+    const { type, size, sizeRange, name } = req.body;
     const userId = req.user.userId;
+
     console.log(`User ID from token: ${userId}, attempting to create planet`);
 
     if (!userId) {
@@ -65,6 +64,15 @@ router.post("/api/planet/create", authenticateToken, async (req, res) => {
       return res.status(400).json({
         message: "Invalid user identification. Please log in again.",
       });
+    }
+
+    // Validate planet name
+    if (name) {
+      if (name.length < 2 || name.length > 15) {
+        return res.status(400).json({
+          message: "Planet name must be between 2 and 15 characters.",
+        });
+      }
     }
 
     // Check if user already has a planet
@@ -84,10 +92,10 @@ router.post("/api/planet/create", authenticateToken, async (req, res) => {
       });
     }
 
-    // Create new planet
+    // Create new planet including name
     const result = await pool.query(
-      "INSERT INTO planets (user_id, type, size, size_range, created_at) VALUES ($1, $2, $3, $4, NOW()) RETURNING *",
-      [userId, type, size, sizeRange]
+      "INSERT INTO planets (user_id, type, size, size_range, name, created_at) VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING *",
+      [userId, type, size, sizeRange, name || null]
     );
 
     console.log("Planet created successfully:", result.rows[0]);
