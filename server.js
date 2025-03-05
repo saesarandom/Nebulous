@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const path = require("path");
+const planetRoutes = require("./planetRoutes");
 
 // Load environment variables
 dotenv.config();
@@ -15,6 +16,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 app.use(express.static("public"));
+app.use(planetRoutes);
 
 // PostgreSQL connection pool with Neon
 const pool = new Pool({
