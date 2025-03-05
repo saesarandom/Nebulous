@@ -3,21 +3,22 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const { Pool } = require("pg");
 
-// Initialize PostgreSQL connection pool
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl:
-    process.env.NODE_ENV === "production"
+    process.env.DATABASE_URL && process.env.DATABASE_URL.includes("neon.tech")
       ? { rejectUnauthorized: false }
       : false,
 });
 
-// Test database connection
+// Initialize the pool with the correct configuration
+
+// Test the connection
 pool.query("SELECT NOW()", (err, res) => {
   if (err) {
-    console.error("Planet routes - Database connection error:", err);
+    console.error("Database connection test failed:", err);
   } else {
-    console.log("Planet routes - Database connected successfully");
+    console.log("Database connection test successful:", res.rows[0]);
   }
 });
 
@@ -54,9 +55,17 @@ router.post("/api/planet/create", authenticateToken, async (req, res) => {
   try {
     console.log("Creating planet with data:", req.body);
     const { type, size, sizeRange } = req.body;
-    const userId = req.user.id;
 
-    console.log(`User ID: ${userId}, attempting to create planet`);
+    // Use userId instead of id
+    const userId = req.user.userId;
+    console.log(`User ID from token: ${userId}, attempting to create planet`);
+
+    if (!userId) {
+      console.error("User ID is undefined in the token payload");
+      return res.status(400).json({
+        message: "Invalid user identification. Please log in again.",
+      });
+    }
 
     // Check if user already has a planet
     const existingPlanet = await pool.query(
@@ -99,8 +108,16 @@ router.post("/api/planet/create", authenticateToken, async (req, res) => {
 // Route to get user's planet
 router.get("/api/planet", authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.id;
+    // Use userId instead of id
+    const userId = req.user.userId;
     console.log(`Getting planet for user ID: ${userId}`);
+
+    if (!userId) {
+      console.error("User ID is undefined in the token payload");
+      return res.status(400).json({
+        message: "Invalid user identification. Please log in again.",
+      });
+    }
 
     const result = await pool.query(
       "SELECT * FROM planets WHERE user_id = $1",
@@ -118,10 +135,7 @@ router.get("/api/planet", authenticateToken, async (req, res) => {
     res.status(200).json({ planet: result.rows[0] });
   } catch (error) {
     console.error("Error fetching planet:", error);
-    res.status(500).json({
-      message: "Server error. Please try again later.",
-      error: error.message,
-    });
+    res.status(500).json({ message: "Server error. Please try again later." });
   }
 });
 
@@ -156,12 +170,23 @@ router.get("/api/test-auth", authenticateToken, (req, res) => {
 // Route to delete a planet
 router.delete("/api/planet", authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.id;
+    // Use userId instead of id
+    const userId = req.user.userId;
+    console.log(`Deleting planet for user ID: ${userId}`);
+
+    if (!userId) {
+      console.error("User ID is undefined in the token payload");
+      return res.status(400).json({
+        message: "Invalid user identification. Please log in again.",
+      });
+    }
 
     const result = await pool.query(
       "DELETE FROM planets WHERE user_id = $1 RETURNING *",
       [userId]
     );
+
+    console.log(`Deleted ${result.rows.length} planets for user`);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "No planet found to delete." });

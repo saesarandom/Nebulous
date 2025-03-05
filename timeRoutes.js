@@ -18,7 +18,12 @@ const authenticateToken = (req, res, next) => {
 // Route to get game time
 app.get("/api/game-time", authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.id;
+    // Use userId instead of id
+    const userId = req.user.userId;
+
+    if (!userId) {
+      return res.status(400).json({ message: "Invalid user identification" });
+    }
 
     // Get the user's game years from the database
     const result = await pool.query(
@@ -40,7 +45,13 @@ app.get("/api/game-time", authenticateToken, async (req, res) => {
 // Route to update game time
 app.post("/api/game-time", authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.id;
+    // Use userId instead of id
+    const userId = req.user.userId;
+
+    if (!userId) {
+      return res.status(400).json({ message: "Invalid user identification" });
+    }
+
     const { gameYears } = req.body;
 
     if (typeof gameYears !== "number") {
