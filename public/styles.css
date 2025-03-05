@@ -1,0 +1,186 @@
+/* Nebulous Application - Shared Styles */
+
+/* Base styles */
+body {
+  background-color: #000;
+  color: #fff;
+  font-family: "Arial", sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+}
+
+/* Dashboard layout */
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar navigation */
+.sidebar {
+  width: 200px;
+  background-color: #111;
+  padding-top: 20px;
+  border-right: 1px solid #333;
+}
+
+/* Main content area */
+.main-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Navigation buttons */
+.nav-btn {
+  display: block;
+  width: 150px;
+  height: 40px;
+  margin: 10px auto;
+  background-color: #222;
+  color: #fff;
+  border: 1px solid #444;
+  text-align: center;
+  line-height: 40px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-radius: 5px;
+}
+
+.nav-btn:hover {
+  background-color: #333;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.nav-btn.active {
+  background-color: #444;
+  border-color: #666;
+  font-weight: bold;
+}
+
+/* Header styles */
+.header {
+  padding: 15px;
+  background-color: #111;
+  border-bottom: 1px solid #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-info {
+  margin-right: 20px;
+}
+
+.logout-btn {
+  background-color: #6c2121;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background-color: #8b2828;
+}
+
+/* Page content styles */
+.page-title {
+  margin-bottom: 30px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #333;
+}
+
+/* Card styles for content blocks */
+.card.bg-dark {
+  background-color: #111 !important;
+  border: 1px solid #333;
+}
+
+.card-title {
+  color: #ddd;
+  margin-bottom: 15px;
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: #0d6efd;
+  border-color: #0a58ca;
+}
+
+.btn-success {
+  background-color: #198754;
+  border-color: #157347;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #b02a37;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  border-color: #d39e00;
+  color: #000;
+}
+
+/* Form controls */
+.form-control {
+  background-color: #333;
+  border-color: #444;
+  color: #fff;
+}
+
+.form-control:focus {
+  background-color: #444;
+  border-color: #666;
+  color: #fff;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Tables */
+.table {
+  color: #fff;
+}
+
+.table thead th {
+  background-color: #111;
+  border-color: #333;
+}
+
+.table tbody td {
+  border-color: #333;
+}
+
+.table-dark {
+  background-color: #111;
+}
+
+/* Alerts */
+.alert-success {
+  background-color: rgba(25, 135, 84, 0.2);
+  border-color: rgba(25, 135, 84, 0.4);
+  color: #75b798;
+}
+
+.alert-danger {
+  background-color: rgba(220, 53, 69, 0.2);
+  border-color: rgba(220, 53, 69, 0.4);
+  color: #ea868f;
+}
+
+.alert-warning {
+  background-color: rgba(255, 193, 7, 0.2);
+  border-color: rgba(255, 193, 7, 0.4);
+  color: #ffda6a;
+}
+
+.alert-info {
+  background-color: rgba(13, 202, 240, 0.2);
+  border-color: rgba(13, 202, 240, 0.4);
+  color: #6edff6;
+}

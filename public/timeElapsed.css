@@ -1,0 +1,51 @@
+/* Styling for the game time counter */
+
+.game-time-counter {
+  position: fixed;
+  top: 50px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 5px;
+  z-index: 1000;
+  border: 1px solid #444;
+  font-family: "Courier New", monospace;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.time-label {
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 4px;
+}
+
+.time-value {
+  font-size: 16px;
+  font-weight: bold;
+  color: #4fd1c5;
+  text-shadow: 0 0 5px rgba(79, 209, 197, 0.5);
+}
+
+/* For pages with a header, adjust the position */
+.header + .main-content .game-time-counter {
+  top: 70px;
+}
+
+/* Animation for the counter to make it pulse slightly */
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.time-value {
+  animation: pulse 2s infinite;
+}

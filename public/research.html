@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nebulous - Research</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link href="/styles.css" rel="stylesheet" />
+    <link href="/timeElapsed.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- Left Sidebar Navigation -->
+      <div class="sidebar">
+        <a href="dashboard.html" class="nav-btn">Dashboard</a>
+        <a href="planet.html" class="nav-btn">Planet</a>
+        <a href="mecha.html" class="nav-btn">Mecha</a>
+        <a href="buildings.html" class="nav-btn">Buildings</a>
+        <a href="extraction.html" class="nav-btn">Extraction</a>
+        <a href="research.html" class="nav-btn active">Research</a>
+        <a href="events.html" class="nav-btn">Events</a>
+        <a href="slots.html" class="nav-btn">Slots</a>
+        <a href="guide.html" class="nav-btn">Guide</a>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="flex-grow-1 d-flex flex-column">
+        <!-- Header with user info and logout -->
+        <div class="header">
+          <h3>Nebulous - Mecha</h3>
+          <div class="d-flex align-items-center">
+            <div class="user-info">
+              Welcome, <span id="username">User</span>
+            </div>
+            <button id="logoutBtn" class="logout-btn">Logout</button>
+          </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="main-content">
+          <h2 class="page-title">Mecha</h2>
+
+          <!-- Content for this specific section -->
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card bg-dark text-white mb-4">
+                <div class="card-body">
+                  <h4 class="card-title">RESEARCH</h4>
+                  <p class="card-text">
+                    This page will contain SECTION_TITLE features and
+                    information.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error and success message containers -->
+    <div
+      id="error-message"
+      class="alert alert-danger"
+      style="display: none; position: fixed; top: 20px; right: 20px"
+    ></div>
+    <div
+      id="success-message"
+      class="alert alert-success"
+      style="display: none; position: fixed; top: 20px; right: 20px"
+    ></div>
+
+    <!-- Shared JavaScript -->
+    <script src="js/script.js"></script>
+    <script src="js/timeElapsed.js"></script>
+  </body>
+</html>
