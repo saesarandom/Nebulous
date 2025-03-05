@@ -62,18 +62,42 @@
         opacity: 0.6;
       }
 
-      /* Override any canvas-related styles */
       body {
         display: block !important;
         justify-content: normal !important;
         align-items: normal !important;
         height: auto !important;
       }
+
+      .ml-2 {
+        margin-left: 0.5rem;
+      }
+
+      .player-marker {
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 0.6;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0.6;
+        }
+      }
+
+      .player-label {
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        pointer-events: none;
+      }
     </style>
   </head>
   <body>
     <div class="dashboard-container">
-      <!-- Left Sidebar Navigation -->
       <div class="sidebar">
         <a href="dashboard.html" class="nav-btn">Dashboard</a>
         <a href="planet.html" class="nav-btn">Planet</a>
@@ -110,6 +134,13 @@
               <button id="generateSector" class="btn btn-success btn-generate">
                 Generate Random Sector
               </button>
+              <button id="refreshMap" class="btn btn-primary ml-2">
+                Refresh Player Positions
+              </button>
+              <button id="diagnoseSectors" class="btn btn-warning ml-2">
+                Diagnose Sectors
+              </button>
+
               <p class="text-muted" id="map-instructions">
                 Click on the map to zoom in and reveal sector divisions. Use
                 mouse wheel to zoom, drag to pan.
@@ -131,6 +162,14 @@
                   <p class="sector-code" id="sector-code">Not yet generated</p>
                   <p class="text-center" id="sector-description">
                     Generate a sector to begin exploration.
+                  </p>
+
+                  <p class="text-center mt-3">
+                    <span id="player-count">0</span> other players detected in
+                    universe.
+                    <span class="text-muted"
+                      >(Your position shown in red, others in yellow)</span
+                    >
                   </p>
                 </div>
                 <div id="no-sector" class="text-center">
@@ -267,6 +306,80 @@
         let dragStartX = 0;
         let dragStartY = 0;
 
+        async function loadUserSectorFromServer() {
+          try {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+
+            const response = await fetch("/api/sector", {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+
+            if (response.status === 404) {
+              // No sector found on server, use local if available
+              console.log("No sector found on server");
+              return false;
+            }
+
+            if (!response.ok) {
+              console.error(
+                "Failed to load sector from server:",
+                response.status
+              );
+              return false;
+            }
+
+            const data = await response.json();
+            const serverSector = data.sector;
+
+            console.log("Loaded sector from server:", serverSector);
+
+            // Create position object from server data
+            selectedPosition = {
+              squareX: serverSector.square_x,
+              squareY: serverSector.square_y,
+              innerX: serverSector.inner_x,
+              innerY: serverSector.inner_y,
+            };
+
+            // Update localStorage with server data
+            localStorage.setItem(sectorKey, serverSector.sector_code);
+            localStorage.setItem(positionKey, JSON.stringify(selectedPosition));
+
+            // Update UI
+            updateSectorDisplay(serverSector.sector_code);
+
+            // Disable generate button
+            if (generateBtn) {
+              generateBtn.disabled = true;
+              generateBtn.textContent = "Sector Already Assigned";
+              document.getElementById("map-instructions").textContent =
+                "Your sector has been permanently assigned. You can explore the map by clicking, zooming, and panning.";
+            }
+
+            document.getElementById("sector-display").style.display = "block";
+            document.getElementById("no-sector").style.display = "none";
+
+            return true;
+          } catch (error) {
+            console.error("Error loading sector from server:", error);
+            return false;
+          }
+        }
+
+        loadUserSectorFromServer().then((serverSectorFound) => {
+          if (!serverSectorFound) {
+            // If no server sector, check local storage (as the code already does)
+            console.log("Checking local storage for sector data");
+          } else {
+            // Server data loaded, now load all other players
+            loadAllPlayers();
+            centerOnSelectedPosition();
+          }
+        });
+
         // Create username-specific storage keys
         const sectorKey = `nebulous_sector_${username}`;
         const positionKey = `nebulous_position_${username}`;
@@ -328,6 +441,13 @@
           drawAllSquares();
         };
 
+        document
+          .getElementById("refreshMap")
+          .addEventListener("click", function () {
+            loadAllPlayers();
+            showSuccess("Player positions refreshed");
+          });
+
         function drawSquare(x, y, size, isSelected = false) {
           if (isSelected) {
             // Highlight selected square if needed
@@ -342,6 +462,9 @@
           ctx.strokeStyle = "white";
           ctx.strokeRect(x, y, size, size);
         }
+
+        let playerPositions = [];
+        let currentUserId = null;
 
         function drawAllSquares() {
           ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -358,20 +481,179 @@
             drawSquare(square.x, square.y, square.size, isSelected);
           });
 
+          // Draw selected position (your own position)
           if (selectedPosition) {
             const { squareX, squareY, innerX, innerY } = selectedPosition;
-            const squareSize = 20;
-            const cellSize = squareSize / 10;
+            const cellSize = 20 / 10; // Adjusted cell size
 
             const pixelX = squareX + innerX * cellSize;
             const pixelY = squareY + innerY * cellSize;
 
-            ctx.fillStyle = "red";
-            ctx.fillRect(pixelX, pixelY, 10 / zoomLevel, 10 / zoomLevel);
+            // Add glow effect for your marker
+            ctx.shadowColor = "rgba(255, 0, 0, 0.8)";
+            ctx.shadowBlur = 5;
 
-            console.log("Drew marker at:", pixelX, pixelY);
+            ctx.fillStyle = "red";
+            ctx.beginPath();
+            ctx.arc(
+              pixelX + 5 / zoomLevel,
+              pixelY + 5 / zoomLevel,
+              5 / zoomLevel,
+              0,
+              Math.PI * 2
+            );
+            ctx.fill();
+
+            // Reset shadow
+            ctx.shadowBlur = 0;
+
+            // Add YOUR location text
+            if (zoomLevel > 2) {
+              ctx.fillStyle = "white";
+              ctx.font = `${12 / zoomLevel}px Arial`;
+              ctx.textAlign = "center";
+              ctx.fillText(
+                "YOU",
+                pixelX + 5 / zoomLevel,
+                pixelY - 5 / zoomLevel
+              );
+            }
+          }
+
+          // Draw other players' positions
+          if (playerPositions && playerPositions.length > 0) {
+            playerPositions.forEach((player) => {
+              // Skip current user since we already drew it in red
+              if (player.user_id === currentUserId) return;
+
+              const pixelX = player.square_x + player.inner_x * (20 / 10);
+              const pixelY = player.square_y + player.inner_y * (20 / 10);
+
+              // Add glow effect for other players
+              ctx.shadowColor = "rgba(255, 255, 0, 0.6)";
+              ctx.shadowBlur = 5;
+
+              ctx.fillStyle = "gold";
+              ctx.beginPath();
+              ctx.arc(
+                pixelX + 5 / zoomLevel,
+                pixelY + 5 / zoomLevel,
+                4 / zoomLevel,
+                0,
+                Math.PI * 2
+              );
+              ctx.fill();
+
+              // Reset shadow
+              ctx.shadowBlur = 0;
+
+              // Draw player name if zoomed in enough
+              if (zoomLevel > 2) {
+                ctx.fillStyle = "white";
+                ctx.font = `${10 / zoomLevel}px Arial`;
+                ctx.textAlign = "center";
+                ctx.fillText(
+                  player.username,
+                  pixelX + 5 / zoomLevel,
+                  pixelY - 5 / zoomLevel
+                );
+              }
+            });
           }
         }
+
+        loadAllPlayers();
+
+        async function syncLocalSectorWithServer() {
+          try {
+            const token = localStorage.getItem("token");
+            if (!token) return false;
+
+            // Get sector data from localStorage
+            const sectorKey = `nebulous_sector_${username}`;
+            const positionKey = `nebulous_position_${username}`;
+
+            const storedSector = localStorage.getItem(sectorKey);
+            const storedPositionData = localStorage.getItem(positionKey);
+
+            if (!storedSector || !storedPositionData) {
+              console.log("No local sector data to sync");
+              return false;
+            }
+
+            // Parse position data
+            const position = JSON.parse(storedPositionData);
+
+            console.log(
+              "Syncing local sector with server:",
+              storedSector,
+              position
+            );
+
+            // Send data to server
+            const response = await fetch("/api/sector/sync", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                sector: storedSector,
+                position: position,
+              }),
+            });
+
+            if (!response.ok) {
+              console.error(
+                "Failed to sync sector with server:",
+                response.status
+              );
+              return false;
+            }
+
+            const data = await response.json();
+            console.log("Sector synced successfully:", data);
+            return true;
+          } catch (error) {
+            console.error("Error syncing sector with server:", error);
+            return false;
+          }
+        }
+
+        // Call this function at startup
+        document.addEventListener("DOMContentLoaded", function () {
+          setTimeout(() => {
+            syncLocalSectorWithServer();
+          }, 1000); // Wait 1 second after page load to ensure username is available
+        });
+
+        // Add this to initializeMap, after loadUserSectorFromServer
+        // Modify the existing code:
+        loadUserSectorFromServer().then((serverSectorFound) => {
+          if (!serverSectorFound) {
+            // If no server sector, check local storage (as the code already does)
+            console.log("Checking local storage for sector data");
+
+            // If we have local data but not server data, sync it
+            if (localStorage.getItem(sectorKey)) {
+              syncLocalSectorWithServer();
+            }
+          } else {
+            // Server data loaded, now load all other players
+            loadAllPlayers();
+            centerOnSelectedPosition();
+          }
+        });
+
+        // Also add syncLocalSectorWithServer call to the refresh button handler
+        document
+          .getElementById("refreshMap")
+          .addEventListener("click", function () {
+            syncLocalSectorWithServer().then(() => {
+              loadAllPlayers();
+              showSuccess("Player positions refreshed");
+            });
+          });
 
         function splitAllSquares() {
           if (clickCount >= 5) return;
@@ -510,7 +792,6 @@
           updateSectorDisplay(positionFormat);
 
           // Store the sector code AND position data in localStorage for persistence
-          // Use username-specific keys
           localStorage.setItem(sectorKey, positionFormat);
           localStorage.setItem(positionKey, JSON.stringify(selectedPosition));
 
@@ -522,35 +803,34 @@
               "Your sector has been permanently assigned. You can explore the map by clicking, zooming, and panning.";
           }
 
-          // Send sector data to server (you'll implement this API later)
+          // Send sector data to server
           try {
-            // This is where you would send the data to your Neon database
-            // For now, we'll just log it
-            console.log(
-              "Would save sector",
-              positionFormat,
-              "for user",
-              username,
-              "to database"
-            );
-
-            // Future implementation example:
-            /*
-            fetch('/api/sector/assign', {
-              method: 'POST',
+            const token = localStorage.getItem("token");
+            fetch("/api/sector/assign", {
+              method: "POST",
               headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
               },
               body: JSON.stringify({
-                username: username,
                 sector: positionFormat,
-                position: selectedPosition
+                position: selectedPosition,
+              }),
+            })
+              .then((response) => {
+                if (!response.ok) {
+                  console.error(
+                    "Failed to save sector to server:",
+                    response.status
+                  );
+                  // If server save fails, still show the sector locally
+                }
               })
-            });
-            */
+              .catch((error) => {
+                console.error("Error saving sector to server:", error);
+              });
           } catch (e) {
-            console.error("Error saving sector to server:", e);
+            console.error("Error preparing sector data for server:", e);
           }
 
           // Center the view on the selected position
@@ -560,9 +840,67 @@
           showSuccess("Sector successfully assigned: " + positionFormat);
 
           // Draw everything
-          drawAllSquares();
+          loadAllPlayers();
         }
+        async function loadAllPlayers() {
+          try {
+            const token = localStorage.getItem("token");
+            if (!token) return;
 
+            console.log("Loading all player positions...");
+
+            // Show a loading indicator in player count
+            document.getElementById("player-count").textContent = "loading...";
+
+            const response = await fetch("/api/sectors/all", {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+
+            if (!response.ok) {
+              console.error("Failed to load all sectors:", response.status);
+              document.getElementById("player-count").textContent = "error";
+              return;
+            }
+
+            const data = await response.json();
+
+            // Handle case where data.sectors might be empty
+            if (!data.sectors || !Array.isArray(data.sectors)) {
+              console.log("No sector data received from server");
+              playerPositions = [];
+              currentUserId = data.currentUserId;
+              document.getElementById("player-count").textContent = "0";
+              drawAllSquares();
+              return;
+            }
+
+            playerPositions = data.sectors;
+            currentUserId = data.currentUserId;
+
+            // Update player count in the UI
+            const otherPlayerCount = playerPositions.filter(
+              (p) => p.user_id !== currentUserId
+            ).length;
+            document.getElementById("player-count").textContent =
+              otherPlayerCount;
+
+            console.log(
+              `Loaded ${playerPositions.length} player positions (${otherPlayerCount} other players)`
+            );
+
+            // Log the first few entries for debugging
+            if (playerPositions.length > 0) {
+              console.log("Sample player data:", playerPositions.slice(0, 2));
+            }
+
+            drawAllSquares(); // Redraw with all players
+          } catch (error) {
+            console.error("Error loading player positions:", error);
+            document.getElementById("player-count").textContent = "error";
+          }
+        }
         function centerOnSelectedPosition() {
           if (!selectedPosition) return;
 
@@ -575,9 +913,9 @@
           offsetX = canvasRect.width / 2 - squareX * zoomLevel;
           offsetY = canvasRect.height / 2 - squareY * zoomLevel;
 
+          loadAllPlayers(); // Load all players when centering
           drawAllSquares();
         }
-
         // Event Listeners
         canvas.addEventListener("click", () => {
           console.log("Canvas clicked, clickCount:", clickCount);
@@ -671,6 +1009,126 @@
         // Initial drawing happens after image load or in the error handler
         console.log("Map initialization complete for user:", username);
       }
+
+      async function diagnoseSectors() {
+        try {
+          const token = localStorage.getItem("token");
+          if (!token) {
+            showError("Not logged in");
+            return;
+          }
+
+          // Show loading message
+          showSuccess("Running diagnostics...");
+
+          // Call the diagnostic endpoint
+          const response = await fetch("/api/sectors/diagnose", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            showError(`Diagnostic failed: ${response.status}`);
+            return;
+          }
+
+          const data = await response.json();
+
+          // Create a diagnostic message
+          let message = `
+      <strong>Sector Diagnostics:</strong><br>
+      Table exists: ${data.tableExists ? "Yes" : "No"}<br>
+      Total sectors: ${data.sectorCount}<br>
+      Errors found: ${data.errorEntries.length}<br>
+      Recent entries: ${data.recentEntries.length}<br>
+      <br>
+      <strong>Local Storage:</strong><br>
+      Username: ${username}<br>
+      Sector key: ${
+        localStorage.getItem(`nebulous_sector_${username}`) || "Not set"
+      }<br>
+      Position data: ${
+        localStorage.getItem(`nebulous_position_${username}`)
+          ? "Set"
+          : "Not set"
+      }<br>
+      <br>
+      <strong>Recent entries:</strong><br>
+      ${data.recentEntries
+        .map((entry) => `User: ${entry.username}, Sector: ${entry.sector_code}`)
+        .join("<br>")}
+    `;
+
+          // Display it
+          const diagElement = document.createElement("div");
+          diagElement.className = "diagnostic-popup";
+          diagElement.innerHTML = `
+      <div class="diagnostic-content">
+        <h3>Sector Diagnostics</h3>
+        <div class="diagnostic-info">${message}</div>
+        <button id="closeDiag" class="btn btn-primary">Close</button>
+        <button id="forceSyncDiag" class="btn btn-warning">Force Sync</button>
+      </div>
+    `;
+
+          document.body.appendChild(diagElement);
+
+          // Add event listeners to buttons
+          document.getElementById("closeDiag").addEventListener("click", () => {
+            document.body.removeChild(diagElement);
+          });
+
+          document
+            .getElementById("forceSyncDiag")
+            .addEventListener("click", async () => {
+              document.body.removeChild(diagElement);
+              await syncLocalSectorWithServer();
+              loadAllPlayers();
+              showSuccess("Force sync completed");
+            });
+
+          // Add some basic styling
+          const style = document.createElement("style");
+          style.textContent = `
+      .diagnostic-popup {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      .diagnostic-content {
+        background-color: #222;
+        border: 1px solid #444;
+        border-radius: 5px;
+        padding: 20px;
+        max-width: 80%;
+        max-height: 80%;
+        overflow-y: auto;
+      }
+      .diagnostic-info {
+        margin: 15px 0;
+        white-space: pre-line;
+        text-align: left;
+      }
+    `;
+          document.head.appendChild(style);
+        } catch (error) {
+          console.error("Error running diagnostics:", error);
+          showError("Diagnostic error: " + error.message);
+        }
+      }
+
+      // Add event listener for the diagnose button
+      document
+        .getElementById("diagnoseSectors")
+        .addEventListener("click", diagnoseSectors);
     </script>
   </body>
 </html>
