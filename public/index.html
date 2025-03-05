@@ -10,32 +10,63 @@
     />
     <style>
       body {
-        background-color: #f8f9fa;
+        background-color: #000;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
       }
       .form-container {
         max-width: 500px;
         margin: 50px auto;
         padding: 30px;
         border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        background-color: white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        background-color: rgba(15, 15, 20, 0.8);
+        color: #fff;
       }
       .form-title {
         text-align: center;
         margin-bottom: 30px;
-        color: #333;
+        color: #4fd1c5;
+        text-shadow: 0 0 5px rgba(79, 209, 197, 0.5);
       }
       .btn-primary {
         width: 100%;
         padding: 10px;
         margin-top: 20px;
+        background-color: #0d6efd;
+        border-color: #0a58ca;
+      }
+      .form-label {
+        color: #ddd;
+      }
+      .form-control {
+        background-color: rgba(30, 30, 35, 0.6);
+        border-color: #444;
+        color: #fff;
+      }
+      .form-control:focus {
+        background-color: rgba(40, 40, 45, 0.8);
+        border-color: #4fd1c5;
+        color: #fff;
+        box-shadow: 0 0 0 0.25rem rgba(79, 209, 197, 0.25);
+      }
+      .mt-3 a {
+        color: #4fd1c5;
+        text-decoration: none;
+      }
+      .mt-3 a:hover {
+        text-decoration: underline;
       }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="form-container">
-        <h2 class="form-title">Create Account</h2>
+        <h2 class="form-title">Create Your Nebulous Account</h2>
         <div id="message" class="alert" style="display: none"></div>
         <form id="registrationForm">
           <div class="mb-3">
@@ -79,6 +110,12 @@
     </div>
 
     <script>
+      // Random background image script
+      window.addEventListener("DOMContentLoaded", () => {
+        const imageNum = Math.floor(Math.random() * 5) + 1;
+        document.body.style.backgroundImage = `url('/image/intro${imageNum}.png')`;
+      });
+
       document
         .getElementById("registrationForm")
         .addEventListener("submit", async function (e) {

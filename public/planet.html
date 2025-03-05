@@ -10,6 +10,115 @@
     />
     <link href="/styles.css" rel="stylesheet" />
     <link href="/timeElapsed.css" rel="stylesheet" />
+    <style>
+      .planet-selection {
+        background-color: rgba(20, 20, 30, 0.7);
+        border-radius: 10px;
+        border: 1px solid #333;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .type-option {
+        padding: 10px;
+        margin: 5px;
+        border-radius: 5px;
+        background-color: #222;
+        border: 1px solid #444;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .type-option:hover {
+        background-color: #333;
+        transform: translateY(-2px);
+      }
+
+      .type-option.selected {
+        background-color: #0d6efd;
+        border-color: #0a58ca;
+      }
+
+      .size-display {
+        font-size: 1.2rem;
+        color: #4fd1c5;
+        text-align: center;
+        margin: 20px 0;
+      }
+
+      .planet-preview {
+        width: 200px;
+        height: 200px;
+        margin: 0 auto;
+        border-radius: 50%;
+        background-color: #333;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.5s ease;
+      }
+
+      .confirm-btn {
+        margin-top: 20px;
+        background-color: #198754;
+        border-color: #157347;
+      }
+
+      .planet-info {
+        margin-top: 20px;
+        background-color: rgba(20, 20, 30, 0.7);
+        border-radius: 10px;
+        border: 1px solid #333;
+        padding: 20px;
+      }
+
+      /* Planet type preview styles */
+      .planet-a {
+        background: radial-gradient(circle at 30% 30%, #ff6b6b, #833131);
+      }
+      .planet-b {
+        background: radial-gradient(circle at 30% 30%, #f9b876, #8b5e2b);
+      }
+      .planet-f {
+        background: radial-gradient(circle at 30% 30%, #faeab1, #c2b280);
+      }
+      .planet-g {
+        background: radial-gradient(circle at 30% 30%, #faee5a, #daa520);
+      }
+      .planet-k {
+        background: radial-gradient(circle at 30% 30%, #ffa726, #e65100);
+      }
+      .planet-o {
+        background: radial-gradient(circle at 30% 30%, #90caf9, #1565c0);
+      }
+      .planet-s {
+        background: radial-gradient(circle at 30% 30%, #ce93d8, #6a1b9a);
+      }
+      .planet-t-tauri {
+        background: radial-gradient(circle at 30% 30%, #ef9a9a, #b71c1c);
+      }
+      .planet-temna {
+        background: radial-gradient(circle at 30% 30%, #424242, #212121);
+      }
+      .planet-zelezna {
+        background: radial-gradient(circle at 30% 30%, #90a4ae, #455a64);
+      }
+      .planet-neutronova {
+        background: radial-gradient(circle at 30% 30%, #b3e5fc, #0288d1);
+      }
+      .planet-terrestrialni {
+        background: radial-gradient(circle at 30% 30%, #81c784, #2e7d32);
+      }
+      .planet-plynny {
+        background: radial-gradient(circle at 30% 30%, #ffd54f, #ff8f00);
+      }
+      .planet-ledovy {
+        background: radial-gradient(circle at 30% 30%, #bbdefb, #0d47a1);
+      }
+      .planet-exoplaneta {
+        background: radial-gradient(circle at 30% 30%, #ce93d8, #4a148c);
+      }
+    </style>
   </head>
   <body>
     <div class="dashboard-container">
@@ -41,18 +150,187 @@
 
         <!-- Main content -->
         <div class="main-content">
-          <h2 class="page-title">Planet Overview</h2>
+          <h2 class="page-title">Planet Creation</h2>
 
-          <!-- Planet-specific content -->
+          <!-- Planet selection UI -->
           <div class="row">
             <div class="col-md-12">
-              <div class="card bg-dark text-white mb-4">
-                <div class="card-body">
-                  <h4 class="card-title">Planet Information</h4>
-                  <p class="card-text">
-                    This page will contain planet management features and
-                    information.
-                  </p>
+              <div class="planet-selection">
+                <h4>Select Planet Type</h4>
+                <div class="row" id="planet-types">
+                  <div class="col-md-3 col-sm-4 col-6">
+                    <div
+                      class="type-option"
+                      data-type="A"
+                      data-size="300000-600000"
+                    >
+                      A
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-4 col-6">
+                    <div
+                      class="type-option"
+                      data-type="B"
+                      data-size="600000-1000000"
+                    >
+                      B
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-4 col-6">
+                    <div
+                      class="type-option"
+                      data-type="F"
+                      data-size="100000-300000"
+                    >
+                      F
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-4 col-6">
+                    <div
+                      class="type-option"
+                      data-type="G"
+                      data-size="50000-100000"
+                    >
+                      G
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-4 col-6">
+                    <div
+                      class="type-option"
+                      data-type="K"
+                      data-size="10000-50000"
+                    >
+                      K
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-4 col-6">
+                    <div
+                      class="type-option"
+                      data-type="O"
+                      data-size="10000000-50000000"
+                    >
+                      O
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-4 col-6">
+                    <div
+                      class="type-option"
+                      data-type="S"
+                      data-size="1000000-5000000"
+                    >
+                      S
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-4 col-6">
+                    <div
+                      class="type-option"
+                      data-type="T Tauri"
+                      data-size="70000-1400000"
+                    >
+                      T Tauri
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-4 col-6">
+                    <div
+                      class="type-option"
+                      data-type="Temná hvězda"
+                      data-size="10000-20000"
+                    >
+                      Temná hvězda
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-4 col-6">
+                    <div
+                      class="type-option"
+                      data-type="Železná hvězda"
+                      data-size="30000-50000"
+                    >
+                      Železná hvězda
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-4 col-6">
+                    <div
+                      class="type-option"
+                      data-type="Neutronová hvězdda"
+                      data-size="50000-500000"
+                    >
+                      Neutronová hvězdda
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-4 col-6">
+                    <div
+                      class="type-option"
+                      data-type="Terrestriální planeta"
+                      data-size="4000-8000"
+                    >
+                      Terrestriální planeta
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-4 col-6">
+                    <div
+                      class="type-option"
+                      data-type="Plynný obr"
+                      data-size="10000-50000"
+                    >
+                      Plynný obr
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-4 col-6">
+                    <div
+                      class="type-option"
+                      data-type="Ledový obr"
+                      data-size="10000-50000"
+                    >
+                      Ledový obr
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-4 col-6">
+                    <div
+                      class="type-option"
+                      data-type="Exoplaneta"
+                      data-size="2000-12000"
+                    >
+                      Exoplaneta
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row mt-4">
+                  <div class="col-md-6">
+                    <div class="planet-preview" id="planet-preview"></div>
+                    <div class="size-display" id="size-display">
+                      Select a planet type
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="planet-info">
+                      <h5>Planet Information</h5>
+                      <p id="planet-description">
+                        Select a planet type to see description.
+                      </p>
+                      <p>
+                        <strong>Type:</strong> <span id="selected-type">-</span>
+                      </p>
+                      <p>
+                        <strong>Size Range:</strong>
+                        <span id="size-range">-</span>
+                      </p>
+                      <p>
+                        <strong>Generated Size:</strong>
+                        <span id="generated-size">-</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="text-center">
+                  <button
+                    id="confirm-planet"
+                    class="btn btn-success confirm-btn"
+                    disabled
+                  >
+                    Confirm Planet Selection
+                  </button>
                 </div>
               </div>
             </div>
@@ -76,5 +354,136 @@
     <!-- Shared JavaScript -->
     <script src="js/script.js"></script>
     <script src="js/timeElapsed.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const planetTypes = document.querySelectorAll(".type-option");
+        const planetPreview = document.getElementById("planet-preview");
+        const sizeDisplay = document.getElementById("size-display");
+        const planetDescription = document.getElementById("planet-description");
+        const selectedType = document.getElementById("selected-type");
+        const sizeRange = document.getElementById("size-range");
+        const generatedSize = document.getElementById("generated-size");
+        const confirmButton = document.getElementById("confirm-planet");
+
+        // Planet descriptions
+        const descriptions = {
+          A: "Type A stars are the hottest and most massive stars, appearing blue or blue-white in color.",
+          B: "Type B stars are very bright blue-white stars that are extremely hot and luminous.",
+          F: "Type F stars are white in color and slightly larger and hotter than our Sun.",
+          G: "Type G stars (like our Sun) are yellow stars with moderate temperatures.",
+          K: "Type K stars are orange to red in color and slightly cooler than our Sun.",
+          O: "Type O stars are the rarest, hottest, and most massive stars, with blue-violet color.",
+          S: "Type S stars are giant stars similar to M-type stars but with excess amounts of zirconium oxide.",
+          "T Tauri":
+            "T Tauri stars are pre-main sequence stars, still in early stages of gravitational contraction.",
+          "Temná hvězda":
+            "A dark star is a theoretical object composed of dark matter that may have existed during the early universe.",
+          "Železná hvězda":
+            "Iron stars are a hypothetical type of star that could form after an extremely long time.",
+          "Neutronová hvězdda":
+            "Neutron stars are the collapsed cores of massive stars, incredibly dense with strong magnetic fields.",
+          "Terrestriální planeta":
+            "Terrestrial planets are Earth-like with solid rocky surfaces.",
+          "Plynný obr":
+            "Gas giants are large planets primarily composed of hydrogen and helium.",
+          "Ledový obr":
+            "Ice giants are planets composed primarily of substances heavier than hydrogen and helium.",
+          Exoplaneta:
+            "Exoplanets are planets that orbit stars outside our solar system.",
+        };
+
+        let selectedPlanetData = null;
+
+        // Add click event to each planet type option
+        planetTypes.forEach((option) => {
+          option.addEventListener("click", function () {
+            // Remove selected class from all options
+            planetTypes.forEach((opt) => opt.classList.remove("selected"));
+
+            // Add selected class to clicked option
+            this.classList.add("selected");
+
+            // Get data from the selected option
+            const type = this.dataset.type;
+            const sizeRangeStr = this.dataset.size;
+            const [min, max] = sizeRangeStr.split("-").map(Number);
+
+            // Generate random size within range
+            const randomSize =
+              Math.floor(Math.random() * (max - min + 1)) + min;
+
+            // Update planet preview
+            planetPreview.className = "planet-preview";
+
+            // Convert type to CSS class name
+            let cssClass = "planet-" + type.toLowerCase().replace(/\s+/g, "-");
+            planetPreview.classList.add(cssClass);
+
+            // Update info displays
+            sizeDisplay.textContent = `${type}: ${randomSize.toLocaleString()} km`;
+            planetDescription.textContent =
+              descriptions[type] || "No description available.";
+            selectedType.textContent = type;
+            sizeRange.textContent = `${parseInt(
+              min
+            ).toLocaleString()} - ${parseInt(max).toLocaleString()} km`;
+            generatedSize.textContent = `${randomSize.toLocaleString()} km`;
+
+            // Store selected planet data
+            selectedPlanetData = {
+              type: type,
+              size: randomSize,
+              sizeRange: sizeRangeStr,
+            };
+
+            // Enable confirm button
+            confirmButton.disabled = false;
+          });
+        });
+
+        // Confirm button click event
+        confirmButton.addEventListener("click", async function () {
+          if (!selectedPlanetData) {
+            showError("Please select a planet type first.");
+            return;
+          }
+
+          try {
+            const token = localStorage.getItem("token");
+
+            const response = await fetch("/api/planet/create", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(selectedPlanetData),
+            });
+
+            if (response.ok) {
+              showSuccess(
+                "Planet created successfully! Redirecting to dashboard..."
+              );
+
+              // Redirect after 2 seconds
+              setTimeout(() => {
+                window.location.href = "dashboard.html";
+              }, 2000);
+            } else {
+              const data = await response.json();
+              showError(
+                data.message || "Failed to create planet. Please try again."
+              );
+            }
+          } catch (error) {
+            console.error("Error creating planet:", error);
+            showError(
+              "Connection error. Please check your internet connection and try again."
+            );
+          }
+        });
+      });
+    </script>
   </body>
 </html>
