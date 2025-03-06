@@ -1,0 +1,146 @@
+/* Nebulous Buildings Styles */
+
+.resources-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  background-color: rgba(20, 20, 30, 0.7);
+  border-radius: 10px;
+  border: 1px solid #333;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.resource-summary-item {
+  display: flex;
+  align-items: center;
+  background-color: rgba(30, 30, 40, 0.7);
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+.resource-summary-name {
+  font-size: 14px;
+  color: #aaa;
+  margin-right: 5px;
+}
+
+.resource-summary-amount {
+  font-size: 14px;
+  font-weight: bold;
+  color: #4fd1c5;
+}
+
+/* Building specific icons */
+.building-icon {
+  font-size: 48px;
+  opacity: 0.8;
+}
+
+.icon-wind-turbine::before {
+  content: "🌀";
+}
+
+.icon-thermal-tower::before {
+  content: "🔥";
+}
+
+.icon-mining-machine::before {
+  content: "⛏️";
+}
+
+.icon-silo::before {
+  content: "🏗️";
+}
+
+.icon-decomposer::before {
+  content: "♻️";
+}
+
+.icon-water-pump::before {
+  content: "💧";
+}
+
+.icon-synthetic-furnace::before {
+  content: "🔮";
+}
+
+.icon-casino::before {
+  content: "🎰";
+}
+
+/* Building status indicators */
+.building-status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 5px;
+  display: inline-block;
+}
+
+.status-blueprint {
+  background-color: #ffc107;
+}
+
+.status-buildable {
+  background-color: #28a745;
+}
+
+.status-locked {
+  background-color: #6c757d;
+}
+
+/* Override modal backdrop for better contrast */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Tooltip customization */
+.tooltip {
+  --bs-tooltip-bg: rgba(20, 20, 30, 0.95);
+  --bs-tooltip-color: #fff;
+  --bs-tooltip-opacity: 1;
+}
+
+/* Tooltip arrow */
+.tooltip .tooltip-arrow::before {
+  border-top-color: rgba(20, 20, 30, 0.95);
+}
+
+/* Effects when a building is constructed */
+@keyframes building-constructed {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(79, 209, 197, 0);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(79, 209, 197, 0.7);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(79, 209, 197, 0);
+  }
+}
+
+.building-constructed {
+  animation: building-constructed 1s ease;
+}
+
+/* Level badge */
+.building-level {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(13, 110, 253, 0.8);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* Building card position relative for absolute positioning */
+.building-card {
+  position: relative;
+}

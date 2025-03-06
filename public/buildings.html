@@ -10,6 +10,123 @@
     />
     <link href="/styles.css" rel="stylesheet" />
     <link href="/timeElapsed.css" rel="stylesheet" />
+    <link href="/buildings.css" rel="stylesheet" />
+    <style>
+      .building-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .building-card {
+        background-color: rgba(20, 20, 30, 0.8);
+        border-radius: 10px;
+        border: 1px solid #333;
+        padding: 15px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .building-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .building-image {
+        width: 100%;
+        height: 150px;
+        background-color: #222;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: #4fd1c5;
+      }
+
+      .building-name {
+        font-size: 18px;
+        font-weight: bold;
+        color: #4fd1c5;
+        margin-bottom: 8px;
+      }
+
+      .building-description {
+        font-size: 14px;
+        color: #ccc;
+        margin-bottom: 10px;
+      }
+
+      .building-requirements {
+        font-size: 12px;
+        color: #aaa;
+        margin-bottom: 8px;
+      }
+
+      .building-status {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+      }
+
+      .building-count {
+        font-size: 14px;
+        font-weight: bold;
+        color: #fff;
+      }
+
+      .blueprint-btn,
+      .build-btn {
+        width: 100%;
+        margin-top: 5px;
+      }
+
+      .blueprint-btn {
+        background-color: #0d6efd;
+        border-color: #0a58ca;
+      }
+
+      .build-btn {
+        background-color: #198754;
+        border-color: #157347;
+      }
+
+      .disabled-btn {
+        background-color: #444;
+        border-color: #333;
+        cursor: not-allowed;
+      }
+
+      .resource-cost {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-bottom: 8px;
+      }
+
+      .resource-item {
+        background-color: rgba(30, 30, 40, 0.7);
+        padding: 3px 6px;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+
+      .resource-item.sufficient {
+        color: #4fd1c5;
+      }
+
+      .resource-item.insufficient {
+        color: #dc3545;
+      }
+
+      .blueprint-owned {
+        font-size: 12px;
+        color: #ffc107;
+        margin-bottom: 5px;
+      }
+    </style>
   </head>
   <body>
     <div class="dashboard-container">
@@ -31,7 +148,7 @@
       <div class="flex-grow-1 d-flex flex-column">
         <!-- Header with user info and logout -->
         <div class="header">
-          <h3>Nebulous - Mecha</h3>
+          <h3>Nebulous - Buildings</h3>
           <div class="d-flex align-items-center">
             <div class="user-info">
               Welcome, <span id="username">User</span>
@@ -42,20 +159,24 @@
 
         <!-- Main content -->
         <div class="main-content">
-          <h2 class="page-title">Mecha</h2>
+          <h2 class="page-title">Buildings</h2>
 
-          <!-- Content for this specific section -->
-          <div class="row">
-            <div class="col-md-12">
-              <div class="card bg-dark text-white mb-4">
-                <div class="card-body">
-                  <h4 class="card-title">SECTION_TITLE Information</h4>
-                  <p class="card-text">
-                    This page will contain SECTION_TITLE features and
-                    information.
-                  </p>
-                </div>
+          <!-- Resources summary -->
+          <div class="resources-summary" id="resources-summary">
+            <!-- Will be populated by JavaScript -->
+            <div class="spinner-border text-light" role="status">
+              <span class="visually-hidden">Loading resources...</span>
+            </div>
+          </div>
+
+          <!-- Buildings grid -->
+          <div class="building-grid" id="building-grid">
+            <!-- Will be populated by JavaScript -->
+            <div class="text-center w-100">
+              <div class="spinner-border text-light" role="status">
+                <span class="visually-hidden">Loading buildings...</span>
               </div>
+              <p>Loading buildings...</p>
             </div>
           </div>
         </div>
@@ -66,16 +187,68 @@
     <div
       id="error-message"
       class="alert alert-danger"
-      style="display: none; position: fixed; top: 20px; right: 20px"
+      style="
+        display: none;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+      "
     ></div>
     <div
       id="success-message"
       class="alert alert-success"
-      style="display: none; position: fixed; top: 20px; right: 20px"
+      style="
+        display: none;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+      "
     ></div>
 
+    <!-- Building info modal -->
+    <div
+      class="modal fade"
+      id="buildingInfoModal"
+      tabindex="-1"
+      aria-labelledby="buildingInfoModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-light">
+          <div class="modal-header">
+            <h5 class="modal-title" id="buildingInfoModalLabel">
+              Building Information
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" id="buildingInfoModalBody">
+            <!-- Will be populated by JavaScript -->
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Shared JavaScript -->
-    <script src="js/script.js"></script>
-    <script src="js/timeElapsed.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/script.js"></script>
+    <script src="/js/timeElapsed.js"></script>
+    <script src="/js/resources.js"></script>
+    <script src="/js/buildings.js"></script>
   </body>
 </html>

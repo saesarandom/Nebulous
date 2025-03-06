@@ -8,6 +8,7 @@ const path = require("path");
 const planetRoutes = require("./planetRoutes");
 const mapRoutes = require("./mapRoutes");
 const resourceRoutes = require("./resourceRoutes");
+const buildingRoutes = require("./buildingRoutes");
 
 // Load environment variables
 dotenv.config();
@@ -27,6 +28,7 @@ app.use(express.static("public"));
 app.use(planetRoutes);
 app.use(mapRoutes);
 app.use(resourceRoutes);
+app.use(buildingRoutes);
 
 // PostgreSQL connection pool with Neon
 const pool = new Pool({
