@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -10,6 +9,9 @@
     />
     <link href="/styles.css" rel="stylesheet" />
     <link href="/timeElapsed.css" rel="stylesheet" />
+    <link href="/resources.css" rel="stylesheet" />
+    <!-- Fixed script tag below (was missing opening <) -->
+    <script src="/js/resources.js"></script>
     <style>
       .planet-status {
         background-color: rgba(20, 20, 30, 0.7);
@@ -199,6 +201,27 @@
               </div>
             </div>
           </div>
+
+          <!-- Resources Section (Fixed HTML structure) -->
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="section-heading">Resources</h2>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="resources-container" id="resources-container">
+                <!-- Will be populated by resources.js -->
+                <div class="text-center">
+                  <div class="spinner-border text-light" role="status">
+                    <span class="visually-hidden">Loading resources...</span>
+                  </div>
+                  <p class="mt-2">Loading resources...</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -218,7 +241,6 @@
     <!-- Shared JavaScript -->
     <script src="/js/script.js"></script>
     <script src="/js/timeElapsed.js"></script>
-
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         // Check if user is logged in (token exists)
