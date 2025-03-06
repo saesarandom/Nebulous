@@ -94,7 +94,158 @@
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
         pointer-events: none;
       }
+
+/* Add these styles to your map.html <style> section */
+/* Distance calculator styling */
+.distance-calculator-tabs .nav-tabs {
+  border-bottom-color: #444;
+}
+
+.distance-calculator-tabs .nav-link {
+  color: #aaa;
+  background-color: #222;
+  border-color: #333 #333 #444;
+  margin-right: 5px;
+}
+
+.distance-calculator-tabs .nav-link:hover {
+  color: #fff;
+  background-color: #333;
+  border-color: #444 #444 #444;
+}
+
+.distance-calculator-tabs .nav-link.active {
+  color: #4fd1c5;
+  background-color: #333;
+  border-color: #444 #444 #333;
+}
+
+.tab-content {
+  padding: 15px;
+  background-color: #222;
+  border: 1px solid #444;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+}
+
+#distance-result, #player-distances-result {
+  background-color: rgba(30, 30, 40, 0.7);
+  border-radius: 5px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+/* Highlight travel times with different colors */
+#travel-warp9 {
+  color: #dc3545; /* Red for slowest */
+}
+
+#travel-warp-max {
+  color: #ffc107; /* Yellow for medium */
+}
+
+#travel-quantum {
+  color: #0dcaf0; /* Cyan for faster */
+}
+
+#travel-transwarp {
+  color: #20c997; /* Teal for fastest */
+}
+
+/* Table styles */
+.table-dark {
+  background-color: #222;
+}
+
+.table-dark thead th {
+  background-color: #111;
+  border-color: #444;
+}
+
+.table-dark tbody td {
+  border-color: #333;
+}
+
+/* Input styling */
+.form-control {
+  background-color: #333;
+  border-color: #444;
+  color: #fff;
+}
+
+.form-control:focus {
+  background-color: #444;
+  color: #fff;
+  border-color: #4fd1c5;
+  box-shadow: 0 0 0 0.25rem rgba(79, 209, 197, 0.25);
+}
+
+.form-label {
+  color: #ccc;
+  font-size: 0.875rem;
+}
+
+
+#use-my-position {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+#use-my-position:hover {
+  background-color: #5c636a;
+  border-color: #565e64;
+}
+
+#calculate-distance {
+  background-color: #198754;
+  border-color: #157347;
+}
+
+#calculate-distance:hover {
+  background-color: #157347;
+  border-color: #146c43;
+}
+
+#get-player-distances {
+  background-color: #0d6efd;
+  border-color: #0a58ca;
+}
+
+#get-player-distances:hover {
+  background-color: #0a58ca;
+  border-color: #0a53be;
+}
+
+
+.g-2 > * {
+  padding: 0.25rem;
+}
+
+.mb-1 {
+  margin-bottom: 0.25rem !important;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem !important;
+}
+
+.mb-3 {
+  margin-bottom: 1rem !important;
+}
+
+.mt-2 {
+  margin-top: 0.5rem !important;
+}
+
+.mt-3 {
+  margin-top: 1rem !important;
+}
+
+.mt-4 {
+  margin-top: 1.5rem !important;
+}
     </style>
+    <script src="mapDistances.js"></script>
   </head>
   <body>
     <div class="dashboard-container">
@@ -110,7 +261,7 @@
         <a href="guide.html" class="nav-btn">Guide</a>
         <a href="map.html" class="nav-btn active">Map</a>
       </div>
-
+     
       <!-- Main Content Area -->
       <div class="flex-grow-1 d-flex flex-column">
         <!-- Header with user info and logout -->
@@ -178,12 +329,150 @@
                     assign a sector.
                   </p>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+                <div class="row mt-4">
+                  <div class="col-md-12">
+                    <div class="sector-info">
+                      <h4 class="text-center">Distance Calculator</h4>
+                      
+                      <div class="distance-calculator-tabs mb-3">
+                        <ul class="nav nav-tabs" id="distanceCalculatorTabs" role="tablist">
+                          <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="custom-tab" data-bs-toggle="tab" data-bs-target="#custom-coords" type="button" role="tab" aria-controls="custom-coords" aria-selected="true">Custom Coordinates</button>
+                          </li>
+                          <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="players-tab" data-bs-toggle="tab" data-bs-target="#player-distances" type="button" role="tab" aria-controls="player-distances" aria-selected="false">Player Distances</button>
+                          </li>
+                        </ul>
+                      </div>
+                      
+                      <div class="tab-content" id="distanceCalculatorTabContent">
+                        <!-- Custom Coordinates Calculator -->
+                        <div class="tab-pane fade show active" id="custom-coords" role="tabpanel" aria-labelledby="custom-tab">
+                          <div class="row mb-3">
+                            <div class="col-md-6">
+                              <h5 class="text-center">Position 1</h5>
+                              <div class="row g-2">
+                                <div class="col-6">
+                                  <label class="form-label">Square X</label>
+                                  <input type="number" class="form-control" id="pos1-square-x" value="260">
+                                </div>
+                                <div class="col-6">
+                                  <label class="form-label">Square Y</label>
+                                  <input type="number" class="form-control" id="pos1-square-y" value="20">
+                                </div>
+                                <div class="col-6">
+                                  <label class="form-label">Inner X (0-9)</label>
+                                  <input type="number" class="form-control" id="pos1-inner-x" value="6" min="0" max="9">
+                                </div>
+                                <div class="col-6">
+                                  <label class="form-label">Inner Y (0-9)</label>
+                                  <input type="number" class="form-control" id="pos1-inner-y" value="6" min="0" max="9">
+                                </div>
+                              </div>
+                              <div class="mt-2">
+                                <button class="btn btn-sm btn-primary" id="use-my-position">Use My Position</button>
+                              </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                              <h5 class="text-center">Position 2</h5>
+                              <div class="row g-2">
+                                <div class="col-6">
+                                  <label class="form-label">Square X</label>
+                                  <input type="number" class="form-control" id="pos2-square-x" value="220">
+                                </div>
+                                <div class="col-6">
+                                  <label class="form-label">Square Y</label>
+                                  <input type="number" class="form-control" id="pos2-square-y" value="100">
+                                </div>
+                                <div class="col-6">
+                                  <label class="form-label">Inner X (0-9)</label>
+                                  <input type="number" class="form-control" id="pos2-inner-x" value="3" min="0" max="9">
+                                </div>
+                                <div class="col-6">
+                                  <label class="form-label">Inner Y (0-9)</label>
+                                  <input type="number" class="form-control" id="pos2-inner-y" value="6" min="0" max="9">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div class="text-center mb-3">
+                            <button class="btn btn-success" id="calculate-distance">Calculate Distance</button>
+                          </div>
+                          
+                          <div id="distance-result" style="display: none;">
+                            <hr>
+                            <h5 class="text-center">Distance Results</h5>
+                            <div class="row">
+                              <div class="col-md-6">
+                                <div class="mb-2">
+                                  <strong>Grid Distance:</strong> <span id="grid-distance"></span>
+                                </div>
+                                <div class="mb-2">
+                                  <strong>Distance:</strong> <span id="light-years-distance"></span>
+                                </div>
+                                <div class="mb-2">
+                                  <strong>Percentage of Universe:</strong> <span id="universe-percentage"></span>%
+                                </div>
+                              </div>
+                              <div class="col-md-6">
+                                <h6>Travel Time Estimates:</h6>
+                                <div class="mb-1">
+                                  <small>Warp Factor 9:</small> <span id="travel-warp9"></span>
+                                </div>
+                                <div class="mb-1">
+                                  <small>Maximum Warp:</small> <span id="travel-warp-max"></span>
+                                </div>
+                                <div class="mb-1">
+                                  <small>Quantum Slipstream:</small> <span id="travel-quantum"></span>
+                                </div>
+                                <div class="mb-1">
+                                  <small>Transwarp Conduit:</small> <span id="travel-transwarp"></span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!-- Player Distances Tab -->
+                        <div class="tab-pane fade" id="player-distances" role="tabpanel" aria-labelledby="players-tab">
+                          <div class="text-center mb-3">
+                            <p class="mt-2">Click the button below to calculate distances to other players in the universe:</p>
+                            <button class="btn btn-primary" id="get-player-distances">
+                              Calculate Player Distances
+                            </button>
+                          </div>
+                          
+                          <div id="player-distances-result" style="display: none;">
+                            <hr>
+                            <h5 class="text-center">Distance to Other Players</h5>
+                            <p class="text-center text-muted small">From your sector: <span id="your-sector-code">Unknown</span></p>
+                            
+                            <div class="table-responsive">
+                              <table class="table table-dark table-hover">
+                                <thead>
+                                  <tr>
+                                    <th>Player</th>
+                                    <th>Sector</th>
+                                    <th>Distance</th>
+                                    <th>Travel Time</th>
+                                  </tr>
+                                </thead>
+                                <tbody id="player-distances-table">
+                                  <!-- Will be populated by JavaScript -->
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                          
+                          <div id="no-players-message" style="display: none;">
+                            <div class="alert alert-info">
+                              No other players found in the universe.
+                            </div>
+                          </div>
+                        </div>
+
 
     <!-- Error and success message containers -->
     <div
@@ -843,64 +1132,74 @@
           loadAllPlayers();
         }
         async function loadAllPlayers() {
-          try {
-            const token = localStorage.getItem("token");
-            if (!token) return;
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-            console.log("Loading all player positions...");
+    console.log("Loading all player positions...");
+    
+    // Show a loading indicator in player count
+    const playerCountElement = document.getElementById("player-count");
+    if (playerCountElement) {
+      playerCountElement.textContent = "loading...";
+    }
 
-            // Show a loading indicator in player count
-            document.getElementById("player-count").textContent = "loading...";
-
-            const response = await fetch("/api/sectors/all", {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-
-            if (!response.ok) {
-              console.error("Failed to load all sectors:", response.status);
-              document.getElementById("player-count").textContent = "error";
-              return;
-            }
-
-            const data = await response.json();
-
-            // Handle case where data.sectors might be empty
-            if (!data.sectors || !Array.isArray(data.sectors)) {
-              console.log("No sector data received from server");
-              playerPositions = [];
-              currentUserId = data.currentUserId;
-              document.getElementById("player-count").textContent = "0";
-              drawAllSquares();
-              return;
-            }
-
-            playerPositions = data.sectors;
-            currentUserId = data.currentUserId;
-
-            // Update player count in the UI
-            const otherPlayerCount = playerPositions.filter(
-              (p) => p.user_id !== currentUserId
-            ).length;
-            document.getElementById("player-count").textContent =
-              otherPlayerCount;
-
-            console.log(
-              `Loaded ${playerPositions.length} player positions (${otherPlayerCount} other players)`
-            );
-
-            // Log the first few entries for debugging
-            if (playerPositions.length > 0) {
-              console.log("Sample player data:", playerPositions.slice(0, 2));
-            }
-
-            drawAllSquares(); // Redraw with all players
-          } catch (error) {
-            console.error("Error loading player positions:", error);
-            document.getElementById("player-count").textContent = "error";
-          }
+    let serverDataLoaded = false;
+    
+    try {
+      const response = await fetch("/api/sectors/all", {
+        headers: {
+          "Authorization": `Bearer ${token}`
         }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Handle case where data.sectors might be empty
+        if (data.sectors && Array.isArray(data.sectors) && data.sectors.length > 0) {
+          playerPositions = data.sectors;
+          currentUserId = data.currentUserId;
+          serverDataLoaded = true;
+          console.log(`Loaded ${playerPositions.length} player positions from server`);
+        }
+      }
+    } catch (error) {
+      console.log("Could not load player data from server:", error);
+      // We'll use dummy data instead, so no need to show an error
+    }
+    
+    // If we couldn't load data from server or there's only the current user,
+    // generate dummy players for demonstration
+    if (!serverDataLoaded || playerPositions.length <= 1) {
+      generateDummyPlayers();
+    }
+    
+    // Update player count in the UI
+    if (playerCountElement && playerPositions) {
+      const otherPlayerCount = currentUserId ? 
+        playerPositions.filter(p => p.user_id !== currentUserId).length : 
+        playerPositions.length - 1;
+      
+      playerCountElement.textContent = otherPlayerCount;
+    }
+
+    console.log(`Player positions ready: ${playerPositions ? playerPositions.length : 0} players`);
+    
+    // Log the first few entries for debugging
+    if (playerPositions && playerPositions.length > 0) {
+      console.log("Sample player data:", playerPositions.slice(0, 2));
+    }
+    
+    drawAllSquares(); // Redraw with all players
+  } catch (error) {
+    console.error("Error in loadAllPlayers:", error);
+    // Don't show error to user, just log it
+    if (document.getElementById("player-count")) {
+      document.getElementById("player-count").textContent = "0";
+    }
+  }
+}
         function centerOnSelectedPosition() {
           if (!selectedPosition) return;
 
@@ -1129,6 +1428,424 @@
       document
         .getElementById("diagnoseSectors")
         .addEventListener("click", diagnoseSectors);
+
+
+        function calculateDistanceLightYears(pos1, pos2) {
+  // Universe dimensions
+  const UNIVERSE_WIDTH = 640;
+  const UNIVERSE_HEIGHT = 640;
+  const INNER_GRID = 10;
+  const TOTAL_LIGHT_YEARS = 81920000000; // 81.92 billion light years
+  
+  // Extract coordinates
+  const x1 = parseFloat(pos1.squareX) + (parseFloat(pos1.innerX) / INNER_GRID);
+  const y1 = parseFloat(pos1.squareY) + (parseFloat(pos1.innerY) / INNER_GRID);
+  const x2 = parseFloat(pos2.squareX) + (parseFloat(pos2.innerX) / INNER_GRID);
+  const y2 = parseFloat(pos2.squareY) + (parseFloat(pos2.innerY) / INNER_GRID);
+  
+  // Calculate Euclidean distance in grid units
+  const deltaX = x2 - x1;
+  const deltaY = y2 - y1;
+  const gridDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+  
+  // Calculate diagonal of universe
+  const universeDiagonal = Math.sqrt(
+    UNIVERSE_WIDTH * UNIVERSE_WIDTH + 
+    UNIVERSE_HEIGHT * UNIVERSE_HEIGHT
+  );
+  
+  // Convert to light years
+  const lightYearDistance = (gridDistance / universeDiagonal) * TOTAL_LIGHT_YEARS;
+  const percentageOfUniverse = (gridDistance / universeDiagonal) * 100;
+  
+  return {
+    gridDistance: gridDistance,
+    lightYears: lightYearDistance,
+    formattedLightYears: formatLightYears(lightYearDistance),
+    percentageOfUniverse: percentageOfUniverse,
+    travelTimeEstimate: estimateTravelTime(lightYearDistance)
+  };
+}
+
+function formatLightYears(lightYears) {
+  // Format as full number with commas
+  return lightYears.toLocaleString(undefined, {
+    maximumFractionDigits: 0
+  }) + " light years";
+}
+
+function estimateTravelTime(lightYears) {
+  const WARP_FACTOR_9 = 0.25;
+  const WARP_FACTOR_MAX = 0.05;
+  const QUANTUM_SLIPSTREAM = 0.001;
+  const TRANSWARP_CONDUIT = 0.0001;
+  
+  return {
+    warpFactor9: formatTravelTime(lightYears * WARP_FACTOR_9),
+    warpFactorMax: formatTravelTime(lightYears * WARP_FACTOR_MAX),
+    quantumSlipstream: formatTravelTime(lightYears * QUANTUM_SLIPSTREAM),
+    transwarpConduit: formatTravelTime(lightYears * TRANSWARP_CONDUIT),
+  };
+}
+
+function formatTravelTime(years) {
+  if (years < 1) {
+    const days = years * 365;
+    if (days < 1) {
+      const hours = days * 24;
+      if (hours < 1) {
+        const minutes = hours * 60;
+        return minutes.toFixed(1) + " minutes";
+      }
+      return hours.toFixed(1) + " hours";
+    }
+    return days.toFixed(1) + " days";
+  }
+  
+  // Format as full number with commas
+  return years.toLocaleString(undefined, {
+    maximumFractionDigits: 0
+  }) + " years";
+}
+
+// Initialize the distance calculator UI once the map is initialized
+function initDistanceCalculator() {
+  // Button to calculate distance between custom coordinates
+  document.getElementById("calculate-distance").addEventListener("click", function() {
+    // Get coordinates from form
+    const position1 = {
+      squareX: document.getElementById("pos1-square-x").value,
+      squareY: document.getElementById("pos1-square-y").value,
+      innerX: document.getElementById("pos1-inner-x").value,
+      innerY: document.getElementById("pos1-inner-y").value
+    };
+    
+    const position2 = {
+      squareX: document.getElementById("pos2-square-x").value,
+      squareY: document.getElementById("pos2-square-y").value,
+      innerX: document.getElementById("pos2-inner-x").value,
+      innerY: document.getElementById("pos2-inner-y").value
+    };
+    
+    // Validate input - make sure all fields have values
+    for (const key in position1) {
+      if (!position1[key]) {
+        showError(`Position 1 ${key} is required`);
+        return;
+      }
+    }
+    
+    for (const key in position2) {
+      if (!position2[key]) {
+        showError(`Position 2 ${key} is required`);
+        return;
+      }
+    }
+    
+    // Calculate distance client-side
+    const distance = calculateDistanceLightYears(position1, position2);
+    
+    // Update UI with results
+    document.getElementById("grid-distance").textContent = distance.gridDistance.toFixed(2);
+    document.getElementById("light-years-distance").textContent = distance.formattedLightYears;
+    document.getElementById("universe-percentage").textContent = distance.percentageOfUniverse.toFixed(4);
+    
+    document.getElementById("travel-warp9").textContent = distance.travelTimeEstimate.warpFactor9;
+    document.getElementById("travel-warp-max").textContent = distance.travelTimeEstimate.warpFactorMax;
+    document.getElementById("travel-quantum").textContent = distance.travelTimeEstimate.quantumSlipstream;
+    document.getElementById("travel-transwarp").textContent = distance.travelTimeEstimate.transwarpConduit;
+    
+    // Show the results
+    document.getElementById("distance-result").style.display = "block";
+  });
+  
+  // Button to use current player's position
+  document.getElementById("use-my-position").addEventListener("click", function() {
+    if (!selectedPosition) {
+      showError("Your position is not available");
+      return;
+    }
+    
+    document.getElementById("pos1-square-x").value = selectedPosition.squareX;
+    document.getElementById("pos1-square-y").value = selectedPosition.squareY;
+    document.getElementById("pos1-inner-x").value = selectedPosition.innerX;
+    document.getElementById("pos1-inner-y").value = selectedPosition.innerY;
+  });
+  
+  // Button to get distances to all other players
+  document.getElementById("get-player-distances").addEventListener("click", function() {
+  try {
+    // Reset button state
+    document.getElementById("get-player-distances").textContent = "Calculate Player Distances";
+    document.getElementById("get-player-distances").disabled = false;
+    
+    // Check if we have any other players
+    if (!playerPositions || playerPositions.length === 0 || !currentUserId) {
+      document.getElementById("player-distances-result").style.display = "none";
+      document.getElementById("no-players-message").style.display = "block";
+      return;
+    }
+    
+    // Get current player's position
+    const currentPlayer = playerPositions.find(p => p.user_id === currentUserId);
+    
+    if (!currentPlayer) {
+      showError("Your position data is not available");
+      return;
+    }
+    
+    // Set your sector code
+    document.getElementById("your-sector-code").textContent = currentPlayer.sector_code || "Unknown";
+    
+    // Get other players
+    const otherPlayers = playerPositions.filter(p => p.user_id !== currentUserId);
+    
+    if (otherPlayers.length === 0) {
+      document.getElementById("player-distances-result").style.display = "none";
+      document.getElementById("no-players-message").style.display = "block";
+      return;
+    }
+    
+    // Hide no players message
+    document.getElementById("no-players-message").style.display = "none";
+    
+    // Clear existing table
+    const tableBody = document.getElementById("player-distances-table");
+    tableBody.innerHTML = "";
+    
+    // Current player position
+    const myPosition = {
+      squareX: currentPlayer.square_x,
+      squareY: currentPlayer.square_y,
+      innerX: currentPlayer.inner_x,
+      innerY: currentPlayer.inner_y
+    };
+    
+    // Calculate distances to each other player
+    const playerDistances = otherPlayers.map(player => {
+      const otherPosition = {
+        squareX: player.square_x,
+        squareY: player.square_y,
+        innerX: player.inner_x,
+        innerY: player.inner_y
+      };
+      
+      const distance = calculateDistanceLightYears(myPosition, otherPosition);
+      
+      return {
+        userId: player.user_id,
+        username: player.username,
+        sector: player.sector_code,
+        distance: distance
+      };
+    });
+    
+    // Sort by distance (closest first)
+    playerDistances.sort((a, b) => a.distance.lightYears - b.distance.lightYears);
+    
+    // Populate table with player distances
+    playerDistances.forEach(player => {
+      const row = document.createElement("tr");
+      
+      row.innerHTML = `
+        <td>${player.username || 'Unknown Player'}</td>
+        <td>${player.sector || 'Unknown Sector'}</td>
+        <td>${player.distance.formattedLightYears}</td>
+        <td>${player.distance.travelTimeEstimate.quantumSlipstream}</td>
+      `;
+      
+      tableBody.appendChild(row);
+    });
+    
+    // Show results
+    document.getElementById("player-distances-result").style.display = "block";
+    
+  } catch (error) {
+    console.error("Error getting player distances:", error);
+    showError("Error: " + error.message);
+    document.getElementById("player-distances-result").style.display = "none";
+  }
+});
+}
+// Add this to your document ready function or at the end of initializeMap
+document.addEventListener("DOMContentLoaded", function() {
+  setTimeout(() => {
+    initDistanceCalculator();
+  }, 1500); // Wait for the map to initialize first
+});
+
+
+
+
+// First, declare these variables in the global scope of your script
+let playerPositions = [];
+let currentUserId = null;
+
+// Remove all existing get-player-distances event listeners and create a single new one
+function initPlayerDistancesButton() {
+  console.log("Initializing player distances button");
+  const button = document.getElementById("get-player-distances");
+  
+  // Remove existing handlers by cloning and replacing the button
+  if (button) {
+    const newButton = button.cloneNode(true);
+    button.parentNode.replaceChild(newButton, button);
+    
+    // Add the new event handler
+    newButton.addEventListener("click", function() {
+      console.log("Player distances button clicked");
+      showPlayerDistances();
+    });
+  } else {
+    console.error("Player distances button not found");
+  }
+}
+
+// Function to show player distances
+function showPlayerDistances() {
+  console.log("Showing player distances");
+  
+  // First, check if we have our position
+  if (!selectedPosition) {
+    showError("Your position is not available. Please generate a sector first.");
+    return;
+  }
+  
+  // Create a simple table with a few sample players at different distances
+  const tableBody = document.getElementById("player-distances-table");
+  if (!tableBody) {
+    console.error("Could not find player-distances-table element");
+    return;
+  }
+  
+  // Clear the table
+  tableBody.innerHTML = "";
+  
+  // Set your sector code
+  const sectorCode = localStorage.getItem(`nebulous_sector_${username}`) || "Unknown";
+  document.getElementById("your-sector-code").textContent = sectorCode;
+  
+  // Create some sample positions at different distances
+  const samplePlayers = [
+    {
+      username: "NearbyExplorer",
+      sector: "A1B2C3D455",
+      position: {
+        squareX: selectedPosition.squareX + 20,
+        squareY: selectedPosition.squareY + 15,
+        innerX: 5,
+        innerY: 7
+      }
+    },
+    {
+      username: "DistantVoyager",
+      sector: "D4C3B2A187",
+      position: {
+        squareX: selectedPosition.squareX - 100,
+        squareY: selectedPosition.squareY + 200,
+        innerX: 2,
+        innerY: 3
+      }
+    },
+    {
+      username: "GalacticNomad",
+      sector: "B3A4D1C292",
+      position: {
+        squareX: selectedPosition.squareX + 300,
+        squareY: selectedPosition.squareY - 180,
+        innerX: 8,
+        innerY: 1
+      }
+    }
+  ];
+  
+  // Calculate distances for each sample player
+  samplePlayers.forEach(player => {
+    const myPosition = {
+      squareX: selectedPosition.squareX,
+      squareY: selectedPosition.squareY,
+      innerX: selectedPosition.innerX,
+      innerY: selectedPosition.innerY
+    };
+    
+    const distance = calculateDistanceLightYears(myPosition, player.position);
+    
+    // Create a row for this player
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${player.username}</td>
+      <td>${player.sector}</td>
+      <td>${distance.formattedLightYears}</td>
+      <td>${distance.travelTimeEstimate.quantumSlipstream}</td>
+    `;
+    
+    tableBody.appendChild(row);
+  });
+  
+  // Show the results
+  document.getElementById("player-distances-result").style.display = "block";
+  document.getElementById("no-players-message").style.display = "none";
+}
+
+// Function to manually initialize tabs
+function initTabs() {
+  console.log("Initializing tabs manually");
+  
+  // Get all tab buttons
+  const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+  
+  // For each tab button
+  tabButtons.forEach(button => {
+    button.addEventListener('click', function(event) {
+      event.preventDefault();
+      
+      // Get the target tab content
+      const targetId = this.getAttribute('data-bs-target');
+      const targetTab = document.querySelector(targetId);
+      
+      if (!targetTab) {
+        console.error("Target tab not found:", targetId);
+        return;
+      }
+      
+      // Hide all tab contents
+      document.querySelectorAll('.tab-pane').forEach(tab => {
+        tab.classList.remove('show', 'active');
+      });
+      
+      // Show the selected tab content
+      targetTab.classList.add('show', 'active');
+      
+      // Mark this button as active
+      document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      this.classList.add('active');
+      
+      console.log("Switched to tab:", targetId);
+    });
+  });
+}
+
+// Initialize everything at the right time
+document.addEventListener("DOMContentLoaded", function() {
+  // First make sure we wait for the map to initialize
+  setTimeout(() => {
+    console.log("Initializing distance calculator components");
+    
+    // Initialize tabs
+    initTabs();
+    
+    // Initialize the distance calculator
+    initDistanceCalculator();
+    
+    // Initialize the player distances button
+    initPlayerDistancesButton();
+    
+    // Log success
+    console.log("Distance calculator components initialized");
+  }, 2000); // Slightly longer timeout to make sure everything else is ready
+});
     </script>
   </body>
 </html>
