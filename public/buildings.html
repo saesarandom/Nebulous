@@ -10,9 +10,28 @@
     />
     <link href="/styles.css" rel="stylesheet" />
     <link href="/timeElapsed.css" rel="stylesheet" />
-    <link href="/buildings.css" rel="stylesheet" />
     <style>
-      .building-grid {
+      .resources-bar {
+        background-color: rgba(15, 15, 20, 0.8);
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+
+      .resource {
+        margin-right: 15px;
+        color: #ddd;
+      }
+
+      .resource-value {
+        color: #4fd1c5;
+        font-weight: bold;
+      }
+
+      .buildings-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 20px;
@@ -20,111 +39,160 @@
       }
 
       .building-card {
-        background-color: rgba(20, 20, 30, 0.8);
+        background-color: rgba(20, 20, 30, 0.7);
         border-radius: 10px;
         border: 1px solid #333;
-        padding: 15px;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+        transition: transform 0.2s ease;
       }
 
       .building-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+      }
+
+      .building-image-container {
+        position: relative;
+        width: 100%;
+        height: 180px;
+        overflow: hidden;
+        background-color: rgba(0, 0, 0, 0.5);
       }
 
       .building-image {
         width: 100%;
-        height: 150px;
-        background-color: #222;
-        border-radius: 8px;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        color: #4fd1c5;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transition: transform 0.3s ease;
       }
 
-      .building-name {
-        font-size: 18px;
-        font-weight: bold;
-        color: #4fd1c5;
-        margin-bottom: 8px;
-      }
-
-      .building-description {
-        font-size: 14px;
-        color: #ccc;
-        margin-bottom: 10px;
-      }
-
-      .building-requirements {
-        font-size: 12px;
-        color: #aaa;
-        margin-bottom: 8px;
-      }
-
-      .building-status {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 10px;
+      .building-card:hover .building-image {
+        transform: scale(1.05);
       }
 
       .building-count {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #0d6efd;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
         font-size: 14px;
         font-weight: bold;
+      }
+
+      .building-name {
+        color: #4fd1c5;
+        font-size: 18px;
+        padding: 15px 15px 5px;
+        margin: 0;
+      }
+
+      .building-description {
+        color: #ccc;
+        padding: 0 15px 15px;
+        margin: 0;
+        font-size: 14px;
+      }
+
+      .blueprint-status {
+        color: #ffd54f;
+        font-size: 14px;
+        padding: 0 15px 5px;
+      }
+
+      .building-costs {
+        padding: 0 15px 10px;
+        color: #ccc;
+        font-size: 14px;
+      }
+
+      .resource-cost {
+        margin-right: 10px;
+      }
+
+      .resource-cost.wood {
+        color: #81c784;
+      }
+
+      .resource-cost.stone {
+        color: #90a4ae;
+      }
+
+      .resource-cost.iron {
+        color: #b0bec5;
+      }
+
+      .resource-cost.copper {
+        color: #ffab91;
+      }
+
+      .resource-cost.coal {
+        color: #9e9e9e;
+      }
+
+      .building-count-info {
+        padding: 0 15px 10px;
+        font-weight: bold;
+      }
+
+      .build-button {
+        display: block;
+        width: calc(100% - 30px);
+        margin: 0 15px 15px;
+        background-color: #198754;
+        color: white;
+        border: none;
+        padding: 8px 0;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      .build-button:hover {
+        background-color: #157347;
+      }
+
+      .build-button:disabled {
+        background-color: #597a68;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+
+      .section-heading {
+        color: #4fd1c5;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #333;
+      }
+
+      /* Filter buttons */
+      .filter-buttons {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .filter-button {
+        background-color: #333;
         color: #fff;
+        border: 1px solid #444;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.2s ease;
       }
 
-      .blueprint-btn,
-      .build-btn {
-        width: 100%;
-        margin-top: 5px;
-      }
-
-      .blueprint-btn {
+      .filter-button.active {
         background-color: #0d6efd;
         border-color: #0a58ca;
       }
 
-      .build-btn {
-        background-color: #198754;
-        border-color: #157347;
-      }
-
-      .disabled-btn {
+      .filter-button:hover:not(.active) {
         background-color: #444;
-        border-color: #333;
-        cursor: not-allowed;
-      }
-
-      .resource-cost {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
-        margin-bottom: 8px;
-      }
-
-      .resource-item {
-        background-color: rgba(30, 30, 40, 0.7);
-        padding: 3px 6px;
-        border-radius: 4px;
-        font-size: 12px;
-      }
-
-      .resource-item.sufficient {
-        color: #4fd1c5;
-      }
-
-      .resource-item.insufficient {
-        color: #dc3545;
-      }
-
-      .blueprint-owned {
-        font-size: 12px;
-        color: #ffc107;
-        margin-bottom: 5px;
       }
     </style>
   </head>
@@ -161,23 +229,185 @@
         <div class="main-content">
           <h2 class="page-title">Buildings</h2>
 
-          <!-- Resources summary -->
-          <div class="resources-summary" id="resources-summary">
-            <!-- Will be populated by JavaScript -->
-            <div class="spinner-border text-light" role="status">
-              <span class="visually-hidden">Loading resources...</span>
+          <!-- Resources display -->
+          <div class="resources-bar">
+            <div class="resource">
+              Wood: <span class="resource-value" id="wood-display">41,723</span>
+            </div>
+            <div class="resource">
+              Stone:
+              <span class="resource-value" id="stone-display">22,779</span>
+            </div>
+            <div class="resource">
+              Iron: <span class="resource-value" id="iron-display">10,750</span>
+            </div>
+            <div class="resource">
+              Copper:
+              <span class="resource-value" id="copper-display">6,862</span>
+            </div>
+            <div class="resource">
+              Coal: <span class="resource-value" id="coal-display">4,819</span>
             </div>
           </div>
 
+          <!-- Filter buttons -->
+          <div class="filter-buttons">
+            <button class="filter-button active" data-filter="all">
+              All Buildings
+            </button>
+            <button class="filter-button" data-filter="production">
+              Production
+            </button>
+            <button class="filter-button" data-filter="extraction">
+              Extraction
+            </button>
+            <button class="filter-button" data-filter="storage">Storage</button>
+            <button class="filter-button" data-filter="research">
+              Research
+            </button>
+          </div>
+
           <!-- Buildings grid -->
-          <div class="building-grid" id="building-grid">
-            <!-- Will be populated by JavaScript -->
-            <div class="text-center w-100">
-              <div class="spinner-border text-light" role="status">
-                <span class="visually-hidden">Loading buildings...</span>
+          <div class="buildings-grid" id="buildings-container">
+            <!-- Wind Turbine -->
+            <div class="building-card" data-type="production">
+              <div class="building-image-container">
+                <img
+                  src="/image/realturbine.png"
+                  alt="Wind Turbine"
+                  class="building-image"
+                />
+                <div class="building-count">Count: 55</div>
               </div>
-              <p>Loading buildings...</p>
+              <h3 class="building-name">Větrná turbína</h3>
+              <p class="building-description">
+                Generates electricity from wind energy.
+              </p>
+              <div class="blueprint-status">Blueprint owned</div>
+              <div class="building-costs">
+                Building costs:
+                <span class="resource-cost wood">wood: 10</span>
+                <span class="resource-cost stone">stone: 5</span>
+              </div>
+              <div class="building-count-info">Built: 55</div>
+              <button class="build-button">Build</button>
             </div>
+
+            <!-- Thermal Power Plant -->
+            <div class="building-card" data-type="production">
+              <div class="building-image-container">
+                <img
+                  src="/image/turbine.png"
+                  alt="Thermal Power Plant"
+                  class="building-image"
+                />
+                <div class="building-count">Count: 127</div>
+              </div>
+              <h3 class="building-name">Tepla elektrická věž</h3>
+              <p class="building-description">
+                Produces electricity from thermal energy.
+              </p>
+              <div class="blueprint-status">Blueprint owned</div>
+              <div class="building-costs">
+                Building costs:
+                <span class="resource-cost stone">stone: 15</span>
+                <span class="resource-cost iron">iron: 5</span>
+              </div>
+              <div class="building-count-info">Built: 127</div>
+              <button class="build-button">Build</button>
+            </div>
+
+            <!-- Mining Machine -->
+            <div class="building-card" data-type="extraction">
+              <div class="building-image-container">
+                <img
+                  src="/image/mining.png"
+                  alt="Mining Machine"
+                  class="building-image"
+                />
+                <div class="building-count">Count: 217</div>
+              </div>
+              <h3 class="building-name">Těžební stroj</h3>
+              <p class="building-description">
+                Automated machine for resource extraction.
+              </p>
+              <div class="blueprint-status">Blueprint owned</div>
+              <div class="building-costs">
+                Building costs:
+                <span class="resource-cost iron">iron: 20</span>
+              </div>
+              <div class="building-count-info">Built: 217</div>
+              <button class="build-button">Build</button>
+            </div>
+
+            <div class="building-card" data-type="extraction">
+              <div class="building-image-container">
+                <img
+                  src="/image/miningmachine.png"
+                  alt="Silo"
+                  class="building-image"
+                />
+                <div class="building-count">Count: 217</div>
+              </div>
+              <h3 class="building-name">Silo</h3>
+              <p class="building-description">
+                Storage for resources and materials.
+              </p>
+              <div class="blueprint-status">Blueprint owned</div>
+              <div class="building-costs">
+                Building costs:
+                <span class="resource-cost iron">copper: 25</span>
+              </div>
+              <div class="building-count-info">Built: 217</div>
+              <button class="build-button">Build</button>
+            </div>
+
+            <div class="building-card" data-type="extraction">
+              <div class="building-image-container">
+                <img
+                  src="/image/miningmachine.png"
+                  alt="Decomposer"
+                  class="building-image"
+                />
+                <div class="building-count">Count: 217</div>
+              </div>
+              <h3 class="building-name">Decomposer</h3>
+              <p class="building-description">
+                Breaks down complex materials into raw resources.
+              </p>
+              <div class="blueprint-status">Blueprint owned</div>
+              <div class="building-costs">
+                Building costs:
+                <span class="resource-cost iron"
+                  >wood: 10, iron: 10, copper: 20</span
+                >
+              </div>
+              <div class="building-count-info">Built: 117</div>
+              <button class="build-button">Build</button>
+            </div>
+
+            <!-- d: "waterPump",
+      name: "Vodní pumpa",
+      icon: "icon-water-pump",
+      description: "Extracts and purifies water from underground sources.",
+      blueprintCost: {
+        iron: 1000,
+        copper: 4000,
+
+        syntheticFurnace: {
+          id: "syntheticFurnace",
+          name: "Syntetická pec",
+          icon: "icon-synthetic-furnace",
+          description: "Creates synthetic materials at high temperatures.",
+          blueprintCost: {
+            coal: 5000,
+
+            id: "casino",
+            name: "Casino",
+            icon: "icon-casino",
+            description: "Entertainment facility for your planet inhabitants.",
+            blueprintCost: { -->
+            <!-- Additional building cards will be dynamically added here -->
           </div>
         </div>
       </div>
@@ -207,48 +437,137 @@
       "
     ></div>
 
-    <!-- Building info modal -->
-    <div
-      class="modal fade"
-      id="buildingInfoModal"
-      tabindex="-1"
-      aria-labelledby="buildingInfoModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-light">
-          <div class="modal-header">
-            <h5 class="modal-title" id="buildingInfoModalLabel">
-              Building Information
-            </h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body" id="buildingInfoModalBody">
-            <!-- Will be populated by JavaScript -->
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Shared JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/script.js"></script>
-    <script src="/js/timeElapsed.js"></script>
-    <script src="/js/resources.js"></script>
-    <script src="/js/buildings.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/timeElapsed.js"></script>
+
+    <!-- Buildings specific JavaScript -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Initialize resources
+        updateResourcesDisplay();
+
+        // Set up filter buttons
+        const filterButtons = document.querySelectorAll(".filter-button");
+        filterButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            // Remove active class from all buttons
+            filterButtons.forEach((btn) => btn.classList.remove("active"));
+
+            // Add active class to clicked button
+            this.classList.add("active");
+
+            // Get the filter value
+            const filter = this.getAttribute("data-filter");
+
+            // Filter buildings
+            filterBuildings(filter);
+          });
+        });
+
+        // Set up build buttons
+        const buildButtons = document.querySelectorAll(".build-button");
+        buildButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const buildingCard = this.closest(".building-card");
+            const buildingName =
+              buildingCard.querySelector(".building-name").textContent;
+
+            // Example: Check if player has resources
+            if (hasEnoughResources(buildingCard)) {
+              // Deduct resources
+              deductResources(buildingCard);
+
+              // Update building count
+              updateBuildingCount(buildingCard);
+
+              // Show success message
+              showSuccess(`Successfully built ${buildingName}`);
+            } else {
+              // Show error message
+              showError(`Not enough resources to build ${buildingName}`);
+            }
+          });
+        });
+      });
+
+      // Function to filter buildings
+      function filterBuildings(filter) {
+        const buildings = document.querySelectorAll(".building-card");
+
+        buildings.forEach((building) => {
+          if (
+            filter === "all" ||
+            building.getAttribute("data-type") === filter
+          ) {
+            building.style.display = "block";
+          } else {
+            building.style.display = "none";
+          }
+        });
+      }
+
+      // Function to update resources display
+      function updateResourcesDisplay() {
+        // In a real app, this would fetch data from your resource manager
+        // This is just for demonstration
+        document.getElementById("wood-display").textContent = "41,723";
+        document.getElementById("stone-display").textContent = "22,779";
+        document.getElementById("iron-display").textContent = "10,750";
+        document.getElementById("copper-display").textContent = "6,862";
+        document.getElementById("coal-display").textContent = "4,819";
+      }
+
+      // Function to check if player has enough resources
+      function hasEnoughResources(buildingCard) {
+        // This is a simplified version, in a real app you would check against actual resource values
+        return true;
+      }
+
+      // Function to deduct resources when building
+      function deductResources(buildingCard) {
+        // This would deduct resources in a real app
+        // For now, just update the display
+        updateResourcesDisplay();
+      }
+
+      // Function to update building count
+      function updateBuildingCount(buildingCard) {
+        const countDisplay = buildingCard.querySelector(".building-count");
+        const countInfo = buildingCard.querySelector(".building-count-info");
+
+        // Get current count
+        let count = parseInt(countInfo.textContent.match(/\d+/)[0]);
+
+        // Increment count
+        count++;
+
+        // Update displays
+        countDisplay.textContent = `Count: ${count}`;
+        countInfo.textContent = `Built: ${count}`;
+      }
+
+      // Function to show error message
+      function showError(message) {
+        const errorElement = document.getElementById("error-message");
+        errorElement.textContent = message;
+        errorElement.style.display = "block";
+
+        setTimeout(() => {
+          errorElement.style.display = "none";
+        }, 5000);
+      }
+
+      // Function to show success message
+      function showSuccess(message) {
+        const successElement = document.getElementById("success-message");
+        successElement.textContent = message;
+        successElement.style.display = "block";
+
+        setTimeout(() => {
+          successElement.style.display = "none";
+        }, 5000);
+      }
+    </script>
   </body>
 </html>

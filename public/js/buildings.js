@@ -709,99 +709,99 @@ const BuildingManager = {
   },
 
   // Add a debug button to force sync
-  addDebugButton() {
-    setTimeout(() => {
-      const container = document.getElementById("building-grid");
-      if (!container) return;
+  //   addDebugButton() {
+  //     setTimeout(() => {
+  //       const container = document.getElementById("building-grid");
+  //       if (!container) return;
 
-      // Create debug controls section
-      const debugDiv = document.createElement("div");
-      debugDiv.className = "debug-controls";
-      debugDiv.style.marginTop = "20px";
-      debugDiv.style.padding = "10px";
-      debugDiv.style.backgroundColor = "rgba(0,0,0,0.3)";
-      debugDiv.style.borderRadius = "5px";
+  //       // Create debug controls section
+  //       const debugDiv = document.createElement("div");
+  //       debugDiv.className = "debug-controls";
+  //       debugDiv.style.marginTop = "20px";
+  //       debugDiv.style.padding = "10px";
+  //       debugDiv.style.backgroundColor = "rgba(0,0,0,0.3)";
+  //       debugDiv.style.borderRadius = "5px";
 
-      debugDiv.innerHTML = `
-        <h4>Debug Controls</h4>
-        <button id="force-db-sync" class="btn btn-sm btn-warning">Force DB Sync</button>
-        <button id="check-db-state" class="btn btn-sm btn-info ms-2">Check DB State</button>
-        <button id="reset-buildings" class="btn btn-sm btn-danger ms-2">Reset Buildings</button>
-        <div id="debug-output" class="mt-2" style="font-family: monospace; font-size: 12px;"></div>
-      `;
+  //       debugDiv.innerHTML = `
+  //         <h4>Debug Controls</h4>
+  //         <button id="force-db-sync" class="btn btn-sm btn-warning">Force DB Sync</button>
+  //         <button id="check-db-state" class="btn btn-sm btn-info ms-2">Check DB State</button>
+  //         <button id="reset-buildings" class="btn btn-sm btn-danger ms-2">Reset Buildings</button>
+  //         <div id="debug-output" class="mt-2" style="font-family: monospace; font-size: 12px;"></div>
+  //       `;
 
-      container.appendChild(debugDiv);
+  //       container.appendChild(debugDiv);
 
-      // Add event listeners to debug buttons
-      document.getElementById("force-db-sync").addEventListener("click", () => {
-        const debugOutput = document.getElementById("debug-output");
-        debugOutput.textContent = "Forcing database sync...";
+  //       // Add event listeners to debug buttons
+  //       document.getElementById("force-db-sync").addEventListener("click", () => {
+  //         const debugOutput = document.getElementById("debug-output");
+  //         debugOutput.textContent = "Forcing database sync...";
 
-        this.syncBuildingsToDatabase(true)
-          .then(() => {
-            debugOutput.textContent = `Sync completed at ${new Date().toLocaleTimeString()}`;
-          })
-          .catch((error) => {
-            debugOutput.textContent = `Sync error: ${error.message}`;
-          });
-      });
+  //         this.syncBuildingsToDatabase(true)
+  //           .then(() => {
+  //             debugOutput.textContent = `Sync completed at ${new Date().toLocaleTimeString()}`;
+  //           })
+  //           .catch((error) => {
+  //             debugOutput.textContent = `Sync error: ${error.message}`;
+  //           });
+  //       });
 
-      document
-        .getElementById("check-db-state")
-        .addEventListener("click", async () => {
-          const debugOutput = document.getElementById("debug-output");
-          debugOutput.textContent = "Checking database state...";
+  //       document
+  //         .getElementById("check-db-state")
+  //         .addEventListener("click", async () => {
+  //           const debugOutput = document.getElementById("debug-output");
+  //           debugOutput.textContent = "Checking database state...";
 
-          try {
-            const token = localStorage.getItem("token");
-            const response = await fetch("/api/debug/buildings", {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
+  //           try {
+  //             const token = localStorage.getItem("token");
+  //             const response = await fetch("/api/debug/buildings", {
+  //               headers: {
+  //                 Authorization: `Bearer ${token}`,
+  //               },
+  //             });
 
-            const data = await response.json();
+  //             const data = await response.json();
 
-            debugOutput.innerHTML = `
-            DB State at ${new Date().toLocaleTimeString()}:<br>
-            ${JSON.stringify(data, null, 2)
-              .substring(0, 500)
-              .replace(/\n/g, "<br>")}...
-          `;
-          } catch (error) {
-            debugOutput.textContent = `Error checking DB: ${error.message}`;
-          }
-        });
+  //             debugOutput.innerHTML = `
+  //             DB State at ${new Date().toLocaleTimeString()}:<br>
+  //             ${JSON.stringify(data, null, 2)
+  //               .substring(0, 500)
+  //               .replace(/\n/g, "<br>")}...
+  //           `;
+  //           } catch (error) {
+  //             debugOutput.textContent = `Error checking DB: ${error.message}`;
+  //           }
+  //         });
 
-      document
-        .getElementById("reset-buildings")
-        .addEventListener("click", async () => {
-          if (
-            confirm(
-              "Are you sure you want to reset all buildings? This cannot be undone."
-            )
-          ) {
-            const debugOutput = document.getElementById("debug-output");
-            debugOutput.textContent = "Resetting buildings...";
+  //       document
+  //         .getElementById("reset-buildings")
+  //         .addEventListener("click", async () => {
+  //           if (
+  //             confirm(
+  //               "Are you sure you want to reset all buildings? This cannot be undone."
+  //             )
+  //           ) {
+  //             const debugOutput = document.getElementById("debug-output");
+  //             debugOutput.textContent = "Resetting buildings...";
 
-            // Reset local state
-            this.playerBuildings = {};
-            this.blueprints = {};
+  //             // Reset local state
+  //             this.playerBuildings = {};
+  //             this.blueprints = {};
 
-            // Save to localStorage
-            this.saveBuildingsToStorage();
+  //             // Save to localStorage
+  //             this.saveBuildingsToStorage();
 
-            // Sync to database
-            await this.syncBuildingsToDatabase(true);
+  //             // Sync to database
+  //             await this.syncBuildingsToDatabase(true);
 
-            // Refresh display
-            this.createBuildingsGrid();
+  //             // Refresh display
+  //             this.createBuildingsGrid();
 
-            debugOutput.textContent = "Buildings reset successfully";
-          }
-        });
-    }, 1000);
-  },
+  //             debugOutput.textContent = "Buildings reset successfully";
+  //           }
+  //         });
+  //     }, 1000);
+  //   },
 
   // Buy a building blueprint
   buyBlueprint(buildingId) {
@@ -972,6 +972,23 @@ window.addEventListener("unload", function () {
     }
   }
 });
+
+function preloadBuildingImages() {
+  const imagePaths = [
+    "/image/realturbine.png",
+    "/image/turbine.png",
+    "/image/mining.png",
+    // Add other building image paths here
+  ];
+
+  imagePaths.forEach((path) => {
+    const img = new Image();
+    img.src = path;
+  });
+}
+
+// Optionally preload the images
+preloadBuildingImages();
 
 // Expose for debugging
 window.BuildingManager = BuildingManager;

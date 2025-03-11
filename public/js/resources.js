@@ -642,67 +642,67 @@ setInterval(function () {
   }
 }, 30000); // 30 seconds
 
-function addResourceDebugButton() {
-  setTimeout(() => {
-    const container = document.getElementById("resources-container");
-    if (!container) return;
+// function addResourceDebugButton() {
+//   setTimeout(() => {
+//     const container = document.getElementById("resources-container");
+//     if (!container) return;
 
-    // Create debug button
-    const debugBtn = document.createElement("div");
-    debugBtn.className = "text-center mt-3";
-    debugBtn.innerHTML = `
-      <button id="check-db-resources" class="btn btn-sm btn-secondary">
-        Check DB Resources
-      </button>
-      <button id="force-save-resources" class="btn btn-sm btn-primary ml-2">
-        Force Save
-      </button>
-    `;
+//     // Create debug button
+//     const debugBtn = document.createElement("div");
+//     debugBtn.className = "text-center mt-3";
+//     debugBtn.innerHTML = `
+//       <button id="check-db-resources" class="btn btn-sm btn-secondary">
+//         Check DB Resources
+//       </button>
+//       <button id="force-save-resources" class="btn btn-sm btn-primary ml-2">
+//         Force Save
+//       </button>
+//     `;
 
-    // Add to container at the end
-    container.appendChild(debugBtn);
+//     // Add to container at the end
+//     container.appendChild(debugBtn);
 
-    // Add event listener
-    document
-      .getElementById("check-db-resources")
-      .addEventListener("click", async function () {
-        try {
-          const token = localStorage.getItem("token");
-          if (!token) {
-            alert("No token found, please log in first");
-            return;
-          }
+//     // Add event listener
+//     document
+//       .getElementById("check-db-resources")
+//       .addEventListener("click", async function () {
+//         try {
+//           const token = localStorage.getItem("token");
+//           if (!token) {
+//             alert("No token found, please log in first");
+//             return;
+//           }
 
-          const response = await fetch("/api/debug/resources", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+//           const response = await fetch("/api/debug/resources", {
+//             headers: {
+//               Authorization: `Bearer ${token}`,
+//             },
+//           });
 
-          const data = await response.json();
+//           const data = await response.json();
 
-          // Show the resource data
-          alert(JSON.stringify(data, null, 2));
-        } catch (error) {
-          console.error("Error checking DB resources:", error);
-          alert("Error checking DB resources: " + error.message);
-        }
-      });
+//           // Show the resource data
+//           alert(JSON.stringify(data, null, 2));
+//         } catch (error) {
+//           console.error("Error checking DB resources:", error);
+//           alert("Error checking DB resources: " + error.message);
+//         }
+//       });
 
-    // Add event listener for force save
-    document
-      .getElementById("force-save-resources")
-      .addEventListener("click", function () {
-        try {
-          saveResourcesOnExit();
-          alert("Resources force saved to database");
-        } catch (error) {
-          console.error("Error force saving resources:", error);
-          alert("Error force saving resources: " + error.message);
-        }
-      });
-  }, 1000);
-}
+//     // Add event listener for force save
+//     document
+//       .getElementById("force-save-resources")
+//       .addEventListener("click", function () {
+//         try {
+//           saveResourcesOnExit();
+//           alert("Resources force saved to database");
+//         } catch (error) {
+//           console.error("Error force saving resources:", error);
+//           alert("Error force saving resources: " + error.message);
+//         }
+//       });
+//   }, 1000);
+// }
 
 // Call the function to add the button
-document.addEventListener("DOMContentLoaded", addResourceDebugButton);
+// document.addEventListener("DOMContentLoaded", addResourceDebugButton);
